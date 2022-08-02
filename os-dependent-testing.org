@@ -1,0 +1,122 @@
+# -*- mode:org;mode:auto-fill;fill-column:80 -*-
+#+title: Testing Code That Isn't Easy to Test (with Perl)
+#+author: Nicholas Hubbard
+
+Code that performs side effects is difficult to test because we need figure out
+how to sandbox the effects so we can observe the state of the sandbox before and
+after executing the effectful code. The difficulty is multiplied when the side
+effectful code also depends on specific OS configuration. Let us explore my
+solution to such a predicament.
+
+I have been working on the next major release of my [[https://btrfs.wiki.kernel.org/index.php/Main_Page][btrfs]] snapshot manager [[https://github.com/NicholasBHubbard/yabsm][yabsm]]
+and I want to write unit tests for functions that take and delete btrfs
+snapshots. This code performs the side effect of taking and deleting snapshots
+and depends on the OS having a btrfs subvolume available that the user running
+the program has read+write permissions for.
+
+* A quick note on btrfs
+
+  Btrfs is a Linux filesystem that allows you to take snapshots of your
+  filesystem. A btrfs filesystem is organized into various "subvolumes" that can
+  be mounted at various locations in your file tree. A common configuration is
+  to have three subvolumes mounted at =/=, =/home=, and =/.snapshots= so you can
+  seperately snapshot your =/=, and =/home= directories, and store the snapshots
+  in =/.snapshots=.
+  
+  Note that I will fib some details about btrfs for the sake of simplicity.
+
+* The code to be tested
+
+  Let us assume we have already defined the following 4 predicates.
+
+  =is_btrfs_subvolume= is satisfied if passed a string representing the path of 
+  a btrfs subvolume on the system.
+
+  =can_read_write_dir= is satisfied if passed a string representing a directory
+  on the system that the current user as read+write permissions on.
+
+  =is_btrfs_dir= is satisfied if passed a string representing a directory on the
+  system that resides on a btrfs subvolume.
+
+#+BEGIN_SRC
+sub take_snapshot {
+
+    # Take a read-only btrfs snapshot of $subvolume named $name and place it in
+    # $destination.
+
+    my $name        = shift;
+    my $subvolume   = shift;
+    my $destination = shift;
+
+    # preconditions
+    return 0 unless is_btrfs_subvolume($subvolume);
+    return 0 unless can_read_write_dir($subvolume);
+    return 0 unless is_btrfs_dir($destination);
+    return 0 unless can_read_write_dir($destination);
+
+    my $cmd    = "btrfs subvolume snapshot -r '$subvolume' '$destination/$name'";
+    my $status = system $cmd;
+
+    unless (0 == $status) {
+        die "Aborting because '$cmd' exited with non-zero status";
+    }
+
+    return 1;
+}
+
+sub delete_snapshot {
+
+    # Delete the btrfs snapshot $snapshot.
+
+    my $snapshot = shift;
+
+    # preconditions
+    return 0 unless is_btrfs_snapshot($snapshot);
+    return 0 unless can_read_write_dir($snapshot);
+
+    my $cmd   = "btrfs subvolume delete '$snapshot'";
+    my $staus = system $cmd;
+
+    unless (0 == $status) {
+        die "Aborting because '$cmd' exited with non-zero status";
+    }
+
+    return 1;
+}
+#+END_SRC
+
+  =is_btrfs_snapshot= is satisfied if passed a string representing a path to a
+  btrfs snapshot on the system.
+
+* Testing the code
+
+  As you can see the code above uses those 4 predicates to assert that 
+  preconditions are met before we perform the actual side effect of taking or
+  deleting a snapshot. It is also important to notice that if the side effect
+  fails (determined via =btrfs='s exit status) then we kill the program.
+  
+  Maybe in our test environment we can set up different scenarios around these
+  preconditions and see if our assumption that the =btrfs= command will exit
+  successfully if these preconditions are met is correct.
+
+** Finding a btrfs subvolume
+
+   The simplest and most reliable way to find a btrfs subvolume is to ask the
+   tester to supply us one via a command line parameter. We can use Perl's
+   built-in [[https://perldoc.perl.org/Getopt::Long][Getopt::Long]] library to make this easy.
+
+   #+BEGIN_SRC
+   use Getopt::Long;
+   my $BTRFS_SUBVOLUME;
+   GetOptions( 's=s' => \$BTRFS_SUBVOLUME );
+   #+END_SRC
+
+   This =$BTRFS_SUBVOLUME= variable will be doubly helpful to us because if it
+   is undefined we can skip our btrfs specific tests altogether. Perl's built-in
+   [[https://perldoc.perl.org/Test::More][Test::More]] library allows us to skip tests if certain conditions are met, and
+   we can use the definedness of =$BTRFS_SUBVOLUME= for such conditions. 
+   
+** Setting up our preconditions
+
+   If =$BTRFS_SUBVOLUME= is defined then we can attempt to set up our sandbox.
+
