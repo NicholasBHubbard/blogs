@@ -32,11 +32,15 @@ the program has read+write permissions for.
   =is_btrfs_subvolume= is satisfied if passed a string representing the path of 
   a btrfs subvolume on the system.
 
+  =is_btrfs_dir= is satisfied if passed a string representing a directory on the
+  system that resides on a btrfs subvolume.
+
+  =is_btrfs_snapshot= is satisfied if passed a string representing a path to a
+  btrfs snapshot on the system.
+  
   =can_read_write_dir= is satisfied if passed a string representing a directory
   on the system that the current user as read+write permissions on.
 
-  =is_btrfs_dir= is satisfied if passed a string representing a directory on the
-  system that resides on a btrfs subvolume.
 
 #+BEGIN_SRC
 sub take_snapshot {
@@ -84,9 +88,6 @@ sub delete_snapshot {
     return 1;
 }
 #+END_SRC
-
-  =is_btrfs_snapshot= is satisfied if passed a string representing a path to a
-  btrfs snapshot on the system.
 
 * Testing the code
 
