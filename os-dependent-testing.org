@@ -14,6 +14,11 @@ snapshots. This code performs the side effect of taking and deleting snapshots
 and depends on the OS having a btrfs subvolume available that the user running
 the program has read+write permissions for.
 
+This blog post is simply and explanation of a solution for a problem I came
+across. I do not claim to be an any kind of authority on testing code and do not
+claim that my solution is optimal or should be used as a template for your own
+tests.
+
 * A quick note on btrfs
 
   Btrfs is a Linux filesystem that allows you to take snapshots of your
@@ -78,8 +83,8 @@ sub delete_snapshot {
     return 0 unless is_btrfs_snapshot($snapshot);
     return 0 unless can_read_write_dir($snapshot);
 
-    my $cmd   = "btrfs subvolume delete '$snapshot'";
-    my $staus = system $cmd;
+    my $cmd    = "btrfs subvolume delete '$snapshot'";
+    my $status = system $cmd;
 
     unless (0 == $status) {
         die "Aborting because '$cmd' exited with non-zero status";
@@ -100,7 +105,9 @@ sub delete_snapshot {
   preconditions and see if our assumption that the =btrfs= command will exit
   successfully if these preconditions are met is correct.
 
-** Finding a btrfs subvolume
+  We will require that our test script needs to be run with root privilages.
+  
+*** Finding a btrfs subvolume
 
    The simplest and most reliable way to find a btrfs subvolume is to ask the
    tester to supply us one via a command line parameter. We can use Perl's
@@ -117,7 +124,8 @@ sub delete_snapshot {
    [[https://perldoc.perl.org/Test::More][Test::More]] library allows us to skip tests if certain conditions are met, and
    we can use the definedness of =$BTRFS_SUBVOLUME= for such conditions. 
    
-** Setting up our preconditions
+*** Setting up our preconditions
 
    If =$BTRFS_SUBVOLUME= is defined then we can attempt to set up our sandbox.
 
+   
