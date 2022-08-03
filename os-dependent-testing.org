@@ -62,7 +62,9 @@ sub take_snapshot {
 
     # preconditions
     return 0 unless is_btrfs_subvolume($subvolume);
+    return 0 unless can_read_write_dir($subvolume);
     return 0 unless is_btrfs_dir($destination);
+    return 0 unless can_read_write_dir($destination);
 
     my $cmd    = "btrfs subvolume snapshot -r '$subvolume' '$destination/$name'";
     my $status = system $cmd;
