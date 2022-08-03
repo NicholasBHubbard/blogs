@@ -204,7 +204,7 @@ sub delete_snapshot {
    }
    #+END_SRC
 
-   The way I test the code is by testing that if  =take_snapshot= and
+   The way I test the code is by testing that if =take_snapshot= and
    =delete_snapshot= are called with arguments that satisfy their preconditions,
    the functions execute succesfully. I then then observe the state of the
    sandbox to see if a snapshot was in fact taken or deleted.
