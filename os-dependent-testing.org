@@ -109,9 +109,10 @@ sub delete_snapshot {
 
 **** Finding a btrfs subvolume
 
-   The simplest way to find a btrfs subvolume is to ask the tester to supply us
-   one via a command line parameter. We can use Perl's built-in [[https://perldoc.perl.org/Getopt::Long][Getopt::Long]]
-   library to make this easy.
+   We cannot take and delete snapshots unless we have a btrfs subvolume
+   available. The simplest way to find a btrfs subvolume is to ask the tester to
+   supply us one via a command line parameter. We can use Perl's built-in
+   [[https://perldoc.perl.org/Getopt::Long][Getopt::Long]] library to make this easy.
 
    #+BEGIN_SRC
    use Getopt::Long;
@@ -120,7 +121,7 @@ sub delete_snapshot {
    #+END_SRC
 
 
-   We now have a variable =$BTRFS_SUBVOLUME= that if defined means the tester
+   We now have a variable =$BTRFS_SUBVOLUME=, that if defined means the tester
    supplied us with a btrfs subvolume.
    
    Perl's built-in [[https://perldoc.perl.org/Test::More][Test::More]] library allows us to skip tests if certain
@@ -203,6 +204,15 @@ sub delete_snapshot {
    }
    #+END_SRC
 
+   The way I test the code is by testing that if  =take_snapshot= and
+   =delete_snapshot= are called with arguments that satisfy their preconditions,
+   the functions execute succesfully. I then then observe the state of the
+   sandbox to see if a snapshot was in fact taken or deleted.
+
+   I also test that if I call the functions with arguments that do not satisfy
+   the preconditions then the side-effect of taking/deleting a snapshot is never
+   performed. 
+   
 * Summary
 
   The first step to testing side-effectful code is to write the code in a way
