@@ -204,5 +204,5 @@ sub delete_snapshot {
   The first step to testing side-effectful code is to write the code in a way
   that allows it to be tested. I used a set of preconditions on function
   arguments that if satisfied should result in succesful execution of the side
-  effect. I was then able to set up a testing sandbox where I can test the
+  effect. I was then able to set up a testing sandbox where I can observe the
   valididity of these assumptions.
