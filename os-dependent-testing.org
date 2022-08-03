@@ -48,9 +48,7 @@ the code examples.
   differentiate between subvolumes and snapshots.
   
   =can_read_write_dir= is satisfied if passed a directory that the current user
-  has read+write permissions for. This predicate will not be relevant in our
-  tests because we require our test script to run as the root user, who has
-  read+write permissions on every file in the system.
+  has read+write permissions for.   
   
 #+BEGIN_SRC
 sub take_snapshot {
