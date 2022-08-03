@@ -154,12 +154,14 @@ sub delete_snapshot {
 **** Testing
      
    We are ready to write our tests! Lets use the [[https://metacpan.org/pod/Test::Exception][Test::Exception]] library from
-   CPAN to test that our subroutines don't kill the program when they're not
+   [[https://www.cpan.org/][CPAN]] to test that our subroutines don't kill the program when they're not
    supposed to.
 
    Please refer to the documentation on [[https://metacpan.org/pod/Test::Exception#lives_and][Test::Exception::lives_and]],
    [[https://perldoc.perl.org/Test::More#is][Test::More::is]] and [[https://perldoc.perl.org/Test::More#SKIP:-BLOCK][Test::More SKIP blocks]] if you are confused about the test
    framework specific code.
+
+   Here's the tests - be sure to read the comments!
    
    #+BEGIN_SRC
    use Test::More 'no_plan';
@@ -205,5 +207,5 @@ sub delete_snapshot {
   The first step to testing side-effectful code is to write the code in a way
   that allows it to be tested. I used a set of preconditions on function
   arguments that if satisfied should result in succesful execution of the side
-  effect. I was then able to set up a testing sandbox where I can observe the
+  effect. I was able to set up a testing sandbox where I can observe the
   valididity of these assumptions.
