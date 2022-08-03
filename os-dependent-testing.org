@@ -14,6 +14,9 @@ snapshots. This code performs the side effect of taking and deleting snapshots
 and depends on the OS having a btrfs subvolume available that the user running
 the program has read+write permissions on.
 
+Yabsm is written in Perl so if you don't know Perl it may be difficult to follow
+the code examples.
+
 * Disclaimer
 
   This is just a description of a solution to a problem I came across. I do not
