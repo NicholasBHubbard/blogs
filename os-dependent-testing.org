@@ -106,9 +106,6 @@ sub delete_snapshot {
   Hmm, maybe in our test environment we can set up different scenarios around 
   these preconditions and see if our assumptions are correct.
 
-  We will require that our test script needs to be run with root privilages so
-  we can be sure we have permissions to take/delete any snapshots.
-  
 **** Finding a btrfs subvolume
 
    The simplest way to find a btrfs subvolume is to ask the tester to supply us
@@ -132,13 +129,14 @@ sub delete_snapshot {
 **** Setting up the sandbox
 
    If =$BTRFS_SUBVOLUME= is defined then we can attempt to set up our sandbox.
-   we will use the =tempdir= function from the built-in =File::Temp= library to
+   
+   We will use the =tempdir= function from the built-in =File::Temp= library to
    create a sandbox directory that will be removed when our test script
    terminates.
 
-   Note that we require the test script to run as root if the btrfs specific
-   tests are being run. This makes problems around file permissions dissapear
-   which makes our lives easier.
+   We will require that our test script needs to be run with root privilages so
+   we can be sure we have the necessary permissions for taking and deleting
+   snapshots.
 
    #+BEGIN_SRC
    use File::Temp 'tempdir';
@@ -154,7 +152,7 @@ sub delete_snapshot {
 
 **** Testing
      
-   We are ready to write our tests! We will use the [[https://metacpan.org/pod/Test::Exception][Test::Exception]] library from
+   We are ready to write our tests! Lets use the [[https://metacpan.org/pod/Test::Exception][Test::Exception]] library from
    CPAN to test that our subroutines don't kill the program when they're not
    supposed to.
 
