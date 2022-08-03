@@ -96,7 +96,7 @@ sub delete_snapshot {
 
 * Testing the code
 
-  As you can see the code above uses those 4 predicates to assert that 
+  As you can see the code above uses the 4 predicates to assert that 
   preconditions are met before we perform the actual side effect of taking or
   deleting a snapshot. It is also important to notice that if the side effect
   fails (determined via =btrfs='s exit status) then we kill the program. There
