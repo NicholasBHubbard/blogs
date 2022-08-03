@@ -5,7 +5,7 @@
 Code that performs side effects is difficult to test because we need figure out
 how to sandbox the effects so we can observe the state of the sandbox before and
 after executing the effectful code. The difficulty is increased when the side
-effectful code also depends on specific OS configuration. Let us explore my
+effectful code also depends on specific OS configurations. Let us explore my
 solution to such a predicament.
 
 I have been working on the next major release of my [[https://btrfs.wiki.kernel.org/index.php/Main_Page][btrfs]] snapshot manager [[https://github.com/NicholasBHubbard/yabsm][yabsm]]
@@ -14,9 +14,10 @@ snapshots. This code performs the side effect of taking and deleting snapshots
 and depends on the OS having a btrfs subvolume available that the user running
 the program has read+write permissions on.
 
-This blog post is simply and explanation of my solution to a problem. I do not
-claim to be an any kind of authority on testing code and do not claim that my
-solution is optimal.
+* Disclaimer
+
+  This is just a description of a solution to a problem I came across. I do not
+  claim to be any kind of authority on code testing.
 
 * A quick note on btrfs
 
