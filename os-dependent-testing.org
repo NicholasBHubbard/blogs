@@ -133,7 +133,8 @@ sub delete_snapshot {
    
    We will use the =tempdir= function from the built-in =File::Temp= library to
    create a sandbox directory that will be removed when our test script
-   terminates.
+   terminates. This sandbox will reside on the =$BTRFS_SUBVOLUME= which means
+   we can place snapshots inside it.
 
    We will require that our test script needs to be run with root privilages so
    we can be sure we have the necessary permissions for taking and deleting
