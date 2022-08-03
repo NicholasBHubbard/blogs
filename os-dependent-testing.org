@@ -100,11 +100,11 @@ sub delete_snapshot {
   preconditions are met before we perform the actual side effect of taking or
   deleting a snapshot. It is also important to notice that if the side effect
   fails (determined via =btrfs='s exit status) then we kill the program. There
-  is an underlying assumption going on here, that if certain preconditions are
-  met then we can be sure that our =btrfs subvol= command will run successfully.
+  is an underlying assumption going on here; if certain preconditions are met
+  then we can be sure that our =btrfs= system command will run successfully.
   
-  Maybe in our test environment we can set up different scenarios around these
-  preconditions and see if our assumptions are correct.
+  Hmm, maybe in our test environment we can set up different scenarios around 
+  these preconditions and see if our assumptions are correct.
 
   We will require that our test script needs to be run with root privilages so
   we can be sure we have permissions to take/delete any snapshots.
