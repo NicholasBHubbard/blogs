@@ -39,7 +39,7 @@ the code examples.
   a btrfs subvolume on the system.
 
   =is_btrfs_dir= is satisfied if passed a string representing a directory on the
-  system that resides on a btrfs subvolume.
+  system that resystem(fs subvolume.
 
   =is_btrfs_snapshot= is satisfied if passed a string representing a path to a
   btrfs snapshot on the system. This predicate is a bit of a fib because every
@@ -66,11 +66,11 @@ sub take_snapshot {
     return 0 unless is_btrfs_dir($destination);
     return 0 unless can_read_write_dir($destination);
 
-    my $cmd    = "btrfs subvolume snapshot -r '$subvolume' '$destination/$name'";
+    my @cmd    = 'btrfs subvolume snapshot -r', $subvolume, "$destination/$name";
     my $status = system $cmd;
 
     unless (0 == $status) {
-        die "Aborting because '$cmd' exited with non-zero status";
+        die "Aborting because '@_' exited with non-zero status";
     }
 
     return 1;
