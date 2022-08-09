@@ -1,0 +1,90 @@
+# -*- mode:org;mode:auto-fill;fill-column:120 -*-
+#+title: Four Unrelated Perl Tidbits
+#+author: Nicholas Hubbard
+I recently acquired a copy of [[https://www.oreilly.com/library/view/programming-perl-4th/9781449321451/][Programming Perl]], often refereed to as "The Camel Book" in the Perl community. After
+reading the first 4 chapters I thought I would share a few Perl tidbits I found interesting.
+
+* While <> is True
+
+Say we have the following file named =logos.txt=.
+#+BEGIN_SRC
+Onion
+Camel
+
+Raptor
+#+END_SRC
+
+And in the same directory we have the following program named =scratch.pl=.
+#+BEGIN_SRC
+open my $fh, '<', 'logos.txt' or die;
+while (my $logo = <$fh>) {
+    print $logo;
+}
+close $fh;
+#+END_SRC
+
+As expected our program prints the contents of =logos.txt=.
+#+BEGIN_SRC
+$ perl ./scratch.pl
+Onion
+Camel
+
+Raptor
+#+END_SRC
+
+Something I never really considered though, is why doesn't the loop exit when =<>= reads the empty line in =logos.txt=?
+Shouldn't =<>= return an empty string which is a false value?
+
+The reason why the loop doesn't exit is because =<>= reads the newline at the end of the line so we actually get ="\n"=
+which is a true value.
+
+* Heredocs Can Execute Shell Commands
+
+Most people know that if you single quote a heredocs terminating string you can prevent variable interpolation.
+
+#+BEGIN_SRC
+my $var = 12;
+print <<'EOS';
+Hello
+$var = 12
+EOS
+#+END_SRC
+
+You can see in the programs output that =$var= was not interpolated.
+
+#+BEGIN_SRC
+$ perl ./scratch.pl
+Hello
+$var = 12
+#+END_SRC
+
+But did you know that if you backquote the terminating string then each line is executed as a shell command?
+
+#+BEGIN_SRC
+print <<`EOC`;
+echo this is a shell command
+echo this is also a shell command
+EOC
+#+END_SRC
+
+When we run this program we can see that the echo commands were executed.
+
+#+BEGIN_SRC
+$ perl ./scratch.pl
+this is a shell command
+this is also a shell command
+#+END_SRC
+
+* The Comma Operator
+
+I always took commas for granted, never realizing they were actually an operator.
+
+Did you ever wonder why lists return their last element when evaluated in scalar context? Turns out it is due to the
+comma operator.
+
+In scalar context the comma operator "," ignores its first argument, and returns its second element evaluated in scalar
+context.
+
+This means that in scalar context the list =(11, 22, 33)= will evaluate to 33. The first comma operator will throw away
+the 11 and then return =(22, 33)= evaluated in scalar context, which will be evaluated by throwing away the 22 and
+returning 33.
