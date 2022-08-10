@@ -1,7 +1,7 @@
 # -*- mode:org;mode:auto-fill;fill-column:120 -*-
 #+title: Four Unrelated Perl Tidbits
 #+author: Nicholas Hubbard
-I recently acquired a copy of [[https://www.oreilly.com/library/view/programming-perl-4th/9781449321451/][Programming Perl]], often refereed to as "The Camel Book" in the Perl community. After
+I recently acquired a copy of [[https://www.oreilly.com/library/view/programming-perl-4th/9781449321451/][Programming Perl]], often referred to as "The Camel Book" in the Perl community. After
 reading the first 4 chapters I thought I would share a few Perl tidbits I found interesting.
 
 * While <> is True
@@ -40,7 +40,7 @@ which is a true value.
 
 * Heredocs Can Execute Shell Commands
 
-Most people know that if you single quote a heredocs terminating string you can prevent variable interpolation.
+Most Perl programmers know that if you single quote a heredocs terminating string you prevent variable interpolation.
 
 #+BEGIN_SRC
 my $var = 12;
@@ -88,3 +88,47 @@ context.
 This means that in scalar context the list =(11, 22, 33)= will evaluate to 33. The first comma operator will throw away
 the 11 and then return =(22, 33)= evaluated in scalar context, which will be evaluated by throwing away the 22 and
 returning 33.
+
+* Auto-Incrementing Strings
+
+In perl you can not only auto-increment numbers, but also strings. To increment a string it must match the regex
+=/^[a-zA-Z]*[0-9]*\z/=.
+
+Single alphabet character strings are incremented intuitively.
+
+#+BEGIN_SRC
+$ perl -E 'my $v = "a"; say ++$v'
+b
+$ perl -E 'my $v1 = "B"; say ++$v1'
+C
+#+END_SRC
+
+What happens though if we increment a non-alphanumeric char. Will it give the next ASCII character? Turns out
+non-alphanumeric characters are treated as 0's when incrementing. Fortunately if we use [[https://perldoc.perl.org/warnings][warnings]] Perl will give us a
+heads up.
+
+#+BEGIN_SRC
+$ perl -W -E 'my $v = "-"; say ++$v'
+Argument "-" treated as 0 in increment (++) at -e line 1.
+1
+#+END_SRC
+
+What happens if we increment =z=, which is at the end of the alphabet? Do we wrap back around to =a=? Turns out this is
+where things get interesting. Perl increments the string just like you would in a regular number system. Just like
+=9 + 1 = 10= in decimal =z + 1 = aa= in ... stringimal.
+
+#+BEGIN_SRC
+$ perl -E 'my $v = "z"; say ++$v'
+aa
+#+END_SRC
+
+Here are some more examples to show you the magic of string auto-incrementing.
+
+#+BEGIN_SRC
+$ perl -W -E 'my $v1 = "foo"; say ++$v1'
+fop
+$ perl -W -E 'my $v1 = "az"; say ++$v1'
+ba
+$ perl -W -E 'my $v1 = "a9"; say ++$v1'
+b0
+#+END_SRC
