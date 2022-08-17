@@ -36,7 +36,7 @@ $ perl -W -I. -MT -E 'say T::num_diff(7, 17)'
 10
 #+END_SRC
 
-But what if we call =num_diff= with only one argument?
+But what if we call =num_diff= with more than two arguments?
 
 #+BEGIN_SRC
 $ perl -W -I. -MT -E 'say T::num_diff(23, 21, 48)'
