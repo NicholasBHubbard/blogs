@@ -1,0 +1,152 @@
+# -*- mode:org;mode:auto-fill;fill-column:80 -*-
+#+title: How I Use Emacs to Write Perl
+#+author: Nicholas Hubbard
+
+This post is about how I use Emacs to write Perl. I do not claim to have the
+best Perl setup of all time or anything like that. The features I need to write
+Perl effectively are syntax highlighting, auto-indentation, linting, and code
+navigation.
+
+I personally like to build my own IDE by bringing together unrelated packages,
+which is in contrast to full blown IDE packages, such as [[https://metacpan.org/pod/Devel::PerlySense][Devel::PerlySense]] or
+[[https://metacpan.org/pod/Perl::LanguageServer][Perl::LanguageServer]]. These packages just aren't for me.
+
+* Basics
+
+By default Emacs uses perl-mode instead of the more advanced cperl-mode. Both
+packages are built-in, so to use cperl-mode instead of perl-mode all you have to
+do is add the following line to your config.
+
+#+BEGIN_SRC
+(fset 'perl-mode 'cperl-mode)
+#+END_SRC
+
+The cperl-mode that was released with Emacs 28 improved the syntax highlighting
+for regular expressions and heredocs. It also fixed an annoying bug where array
+variable names in comments were highlighted with the array face instead of the
+comment face.
+
+If you are using an Emacs version less than 28 then I would recommend
+downloading the [[https://github.com/emacs-mirror/emacs/blob/emacs-28/lisp/progmodes/cperl-mode.el][cperl-mode off the Emacs 28 branch]]. I personally place this file
+in =~/.emacs.d/cperl-mode/cperl-mode.el=, then I load it with -
+
+#+BEGIN_SRC
+(add-to-list 'load "~/.emacs.d/cperl-mode")
+(require 'cperl-mode)
+#+END_SRC
+
+By default cperl-mode replaces trailing whitespace with underscores. I cannot
+imagine why you would want this. To turn it off add the following line to your
+config.
+
+#+BEGIN_SRC
+(setq cperl-invalid-face nil)
+#+END_SRC
+
+cperl-mode indents code by 2 spaces by default. You can modify this by setting
+the =cperl-indent-level= variable.
+
+You probably want multi-line statements wrapped in parens to be indented like a
+block. For example by default cperl-mode indents this hash declaration in a
+strange way.
+#+BEGIN_SRC
+my %hash = (
+            'foo' => 1,
+            'bar' => 2,
+            'baz' => 3
+           );
+#+END_SRC
+
+To fix this add the following to your config.
+
+#+BEGIN_SRC
+(setq cperl-indent-parens-as-block t)
+(setq cperl-close-paren-offset (- cperl-indent-level))
+#+END_SRC
+
+Now our hash declaration indents nicely!
+
+#+BEGIN_SRC
+my %hash = (
+    'foo' => 1,
+    'bar' => 2,
+    'baz' => 3
+);
+#+END_SRC
+
+* Linting
+
+Linting our Perl code helps us easily find bugs caused by typos. My favorite
+Emacs linting package is [[https://www.flycheck.org/en/latest/][Flycheck]], which comes with built-in support for Perl.
+
+By default Flycheck checks your code with the Perl interpreter, but it also
+comes with integration with [[https://metacpan.org/pod/Perl::Critic][Perl::Critic]]. Personally I have only used the
+former.
+
+I like to lint the file everytime I save, and I like to display any errors
+immediately. Here is how I accomplish this with Flycheck.
+#+BEGIN_SRC
+(require 'flycheck)
+(setq flycheck-check-syntax-automatically '(mode-enabled save))
+(setq flycheck-display-errors-delay 0.1)
+#+END_SRC
+
+To enable flycheck mode in cperl-mode, simply turn it on with a hook.
+#+BEGIN_SRC
+(cperl-mode . flycheck-mode)
+#+END_SRC
+
+Now Emacs will underline any syntax errors, and you can view the message in the
+echo area by placing your cursor on the erroneus code.
+
+I cannot tell you how many simple errors you will catch just by using Flycheck!
+
+* Code Navigation
+
+For jumping between function definitions I use [[https://github.com/jacktasia/dumb-jump][dumb-jump]], which usually *just
+works*. I configure dumb-jump to use [[https://github.com/ggreer/the_silver_searcher][ag]] for its searching which makes it work
+very quickly.
+
+#+BEGIN_SRC
+(require 'dumb-jump)
+(setq dumb-jump-force-searcher 'ag)
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+#+END_SRC
+
+I can then use dumb-jump by calling the =xref-find-definitions= function as my
+cursor is on the symbol I want to search for. This function is bound to =M-.= by
+default.
+
+* Shell
+
+A lot of people use =M-x compile= to run their code, and one of the various
+debugger packages to run the Perl debugger. Personally I just use plain old [[https://www.gnu.org/software/bash/][Bash]]
+with the built-in =M-x shell=. This makes my work flow when it comes to running
+and debugging quite similar to that of a classic Perl vimmer who does all their
+work in a terminal.
+
+I use the wonderful [[https://github.com/riscy/shx-for-emacs][shx]] package for making =M-x shell= a more usable shell, and
+I use [[https://github.com/kyagi/shell-pop-el][shell-pop]] for popping up shell buffers that are automatically cd'd to the
+current files directory.
+
+#+BEGIN_SRC
+(require 'shx)
+(add-hook 'shell-mode-hook 'shx-mode)
+
+(require 'shell-pop)
+(setq shell-pop-autocd-to-working-dir t)
+(global-set-key (kbd "M-SPC") 'shell-pop)
+#+END_SRC
+
+* Closing Thoughts
+
+Every 3rd party package I described here is useful not only in Perl, but for
+programming in any language. This gives makes my Emacs configuration uniform
+across different programming languages and for different tasks in general.
+
+* See Also
+
+  [[https://www.emacswiki.org/emacs/CPerlMode][CPerl Documentation]]  - Offical documentation for cperl-mode
+  [[https://metacpan.org/pod/Perl::LanguageServer][Perl::LanguageServer]] - Language server for Perl
+  [[https://metacpan.org/pod/Devel::PerlySense][Devel::PerlySense]]    - Perl IDE features for Emacs
+  [[https://metacpan.org/pod/Emacs::PDE][Emacs::PDE]]           - Elisp extensions for Perl development
