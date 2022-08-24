@@ -28,7 +28,8 @@ comment face.
 
 If you are using an Emacs version less than 28 then I would recommend
 downloading the [[https://github.com/emacs-mirror/emacs/blob/emacs-28/lisp/progmodes/cperl-mode.el][cperl-mode off the Emacs 28 branch]]. I personally place this file
-in =~/.emacs.d/cperl-mode/cperl-mode.el=, then I load it with -
+in =~/.emacs.d/cperl-mode/cperl-mode.el=, then I load it with the following
+code.
 
 #+BEGIN_SRC
 (add-to-list 'load "~/.emacs.d/cperl-mode")
@@ -140,9 +141,10 @@ current files directory.
 
 * Closing Thoughts
 
-Every 3rd party package I described here is useful not only in Perl, but for
-programming in any language. This gives me a uniform experience across different
-programming languages and for different tasks in general.
+Every 3rd party package I described here is useful not only for Perl, but for
+programming in any language. This gives a uniform experience across different
+programming languages. If I instead used one of the Perl IDE packages then I
+wouldn't get the same uniform experience when using other languages.
 
 * See Also
 
