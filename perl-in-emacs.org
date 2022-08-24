@@ -141,10 +141,10 @@ current files directory.
 
 * Closing Thoughts
 
-Every 3rd party package I described here is useful not only for Perl, but for
-programming in any language. This gives a uniform experience across different
-programming languages. If I instead used one of the Perl IDE packages then I
-wouldn't get the same uniform experience when using other languages.
+Every 3rd-party package I described in this post is useful not only for Perl,
+but for programming in any language. This gives a uniform experience across
+different programming languages. If I instead used one of the Perl IDE packages
+then I wouldn't get the same uniform experience when using other languages.
 
 * See Also
 

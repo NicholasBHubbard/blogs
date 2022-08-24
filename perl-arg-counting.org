@@ -1,5 +1,5 @@
 # -*- mode:org;mode:auto-fill;fill-column:120 -*-
-#+title: Perl Doesn't Count Arguments
+#+title: Make Perl Count Arguments
 #+author: Nicholas Hubbard
 
 Unlike many programming languages, Perl doesn't check that functions are called with the correct number of arguments. This

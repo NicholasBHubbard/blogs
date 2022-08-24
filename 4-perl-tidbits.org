@@ -15,7 +15,7 @@ Raptor
 #+END_SRC
 
 And in the same directory we have the following program named =scratch.pl=.
-#+BEGIN_SRC
+#+BEGIN_SRC perl
 open my $fh, '<', 'logos.txt' or die;
 while (my $logo = <$fh>) {
     print $logo;
@@ -42,7 +42,7 @@ which is a true value.
 
 Most Perl programmers know that if you single quote a heredocs terminating string you prevent variable interpolation.
 
-#+BEGIN_SRC
+#+BEGIN_SRC perl
 my $var = 12;
 print <<'EOS';
 Hello
@@ -60,7 +60,7 @@ $var = 12
 
 But did you know that if you backquote the terminating string then each line is executed as a shell command?
 
-#+BEGIN_SRC
+#+BEGIN_SRC perl
 print <<`EOC`;
 echo this is a shell command
 echo this is also a shell command

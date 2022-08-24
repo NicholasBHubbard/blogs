@@ -1,0 +1,106 @@
+Unlike many programming languages, Perl doesn't check that functions are called with the correct number of arguments. This is because Perl subroutines are variadic by default, which makes a lot of programming tasks really easy. The downside is that a lot of the time functions only make sense if they are called with a certain number of arguments.
+
+Most of the time if a subroutine is called with an incorrect number of arguments it is because the programmer made a simple typo. To make our lives as programmers easier, it would be nice if we could detect this situation and give a clear error message about what went wrong.
+
+We will explore a solution to this problem.
+
+WARNING: The examples in this artical call Perl from the command line. If you don't understand Perl command line syntax, only pay attention to what comes after the `-E`.
+
+Lets look at an example.
+
+```perl
+package T;
+
+sub num_diff {
+    my $n1 = shift;
+    my $n2 = shift;
+    return abs($n1 - $n2);
+}
+
+1;
+```
+
+When called with two arguments our function behaves as expected.
+
+    $ perl -W -I. -MT -E 'say T::num_diff(7, 17)'
+    10
+
+But what if we call `num_diff` with more than two arguments?
+
+    $ perl -W -I. -MT -E 'say T::num_diff(23, 21, 48)'
+    2
+
+Perl has no issue if we call this function with 3 arguments, and happily returns us the difference between the first two arguments. This is bad! The difference between 3 numbers is certainly not the difference between the first 2.
+
+A nice way to deal with this problem is to use [signatures](https://perldoc.perl.org/perlsub#Signatures), which provides syntax for declaring a subroutines arguments. Lets rewrite `num_diff` using signatures.
+
+```perl
+package T;
+
+use feature 'signatures';
+
+sub num_diff($n1, $n2) {
+    return abs($n1 - $n2);
+}
+
+1;
+````
+
+Lets see what happens when we call `num_diff` with more than 2 arguments.
+
+    $ perl -I. -MT -E 'say T::num_diff(22, 33, 8)'
+    Too many arguments for subroutine 'T::num_diff' (got 3; expected 2) at -e line 1.
+
+Awesome, our problem is solved! With signatures Perl can count our subroutine arguments and give us error diagnositics when we mess up.
+
+Unfortunately though there are some downsides to signatures. First off signatures didn't exist until Perl version 5.20, so if you're use an old Perl signatures are not an option. The other downside is that signatures were experimental until Perl version 5.36, which is why the `use feature 'signatures'` statement is necessary.
+
+I have been working on a Perl project that uses Perl version 5.16.3, so I cannot use signatures. To count arguments I wrote a function that I call as the first statement in subroutines that kills this program if it did not receive the correct number of arguments.
+
+```perl
+use Carp 'confess';
+
+sub arg_count_or_die {
+
+    # Carp::Confess unless $num_args is in range $lower-$upper
+
+    my $lower    = shift;
+    my $upper    = shift;
+    my $num_args = @_;
+
+    ($lower, $upper) = ($upper, $lower) if $lower > $upper;
+
+    unless ($lower <= $num_args && $num_args <= $upper) {
+        my $caller = ( caller(1) )[3];
+        my $plural = $lower > 1 ? 's' : '';
+        my $arg_range_msg = $lower == $upper ? "$lower arg$plural" : "$lower-$upper args";
+        confess("my-program: internal error: call to '$caller' passed $num_args arg$plural but expects $arg_range_msg");
+    }
+
+    return 1;
+}
+```
+
+Lets rewrite `num_diff` to use this function.
+
+```perl
+sub num_diff {
+
+    arg_count_or_die(2, 2, @_);
+
+    my $n1 = shift;
+    my $n2 = shift;
+
+    return abs($n1 - $n2);
+}
+```
+
+Again, lets call `num_diff` with more than 2 arguments
+
+    $ perl -I. -MT -E 'say T::num_diff(22, 33, 8)'
+    my-program: internal error: call to 'T::num_diff' passed 3 args but expects 2 args at T.pm line 19.
+            T::arg_count_or_die(2, 2, 22, 33, 8) called at T.pm line 27
+            T::num_diff(22, 33, 8) called at -e line 1
+
+We can see that by using Carp::Confess we get an excellent error message that shows the call stack that lead to the to our erroneus subroutine call. By prefixing the error message with `my-program: internal error`, if this error ever occurs our user knows that they found a bug and can send us the stack trace which will be very useful for debugging.
+
