@@ -141,8 +141,8 @@ current files directory.
 * Closing Thoughts
 
 Every 3rd party package I described here is useful not only in Perl, but for
-programming in any language. This gives makes my Emacs configuration uniform
-across different programming languages and for different tasks in general.
+programming in any language. This gives me a uniform experience across different
+programming languages and for different tasks in general.
 
 * See Also
 
