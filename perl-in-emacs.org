@@ -146,7 +146,7 @@ programming languages and for different tasks in general.
 
 * See Also
 
-  [[https://www.emacswiki.org/emacs/CPerlMode][CPerl Documentation]]  - Offical documentation for cperl-mode
-  [[https://metacpan.org/pod/Perl::LanguageServer][Perl::LanguageServer]] - Language server for Perl
-  [[https://metacpan.org/pod/Devel::PerlySense][Devel::PerlySense]]    - Perl IDE features for Emacs
-  [[https://metacpan.org/pod/Emacs::PDE][Emacs::PDE]]           - Elisp extensions for Perl development
++  [[https://www.emacswiki.org/emacs/CPerlMode][CPerl Documentation]]  - Offical documentation for cperl-mode
++  [[https://metacpan.org/pod/Perl::LanguageServer][Perl::LanguageServer]] - Language server for Perl
++  [[https://metacpan.org/pod/Devel::PerlySense][Devel::PerlySense]]    - Perl IDE features for Emacs
++  [[https://metacpan.org/pod/Emacs::PDE][Emacs::PDE]]           - Elisp extensions for Perl development
