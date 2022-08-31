@@ -45,7 +45,7 @@ simplicity. Just make sure you pick a directory that is in your [[https://en.wik
 
 * Initialization
 
-If you want to use plx for your Perl project you must first initialize the
+If you want to use plx for your Perl project, you must first initialize the
 project to use plx. To do this we must =cd= into the root directory of the
 project and then execute plx with the =--init= flag.
 
@@ -58,10 +58,8 @@ This command sets up plx to use the Perl interpreter located in the given path.
 You can now execute your project code with a command like =plx --perl
 /path/to/project/script.pl=.
 
-This is how plx solves the first problem described in the =Why Plx?= section of
-this blog post. We can install any version of Perl onto our system and then
-configure plx to use this version to instead of the system perl to execute our
-projects code.
+This is how plx solves the problem of needing to use a different Perl than your
+systems built-in Perl.
 
 * Installing CPAN Modules
 
@@ -80,8 +78,8 @@ This will install =Some::Module= into a project local library located in a
 directory named =local/lib= at the root of the project directory.
 
 This solves the problem of two projects requiring different versions of the same
-CPAN module. If both projects use plx they can install simply install the
-desired version into their own local::lib.
+CPAN module. If both projects use plx they can simply install the desired
+version into their own local::lib.
 
 * Synopsis
 
@@ -95,8 +93,9 @@ use and understand.
 
 * Bonus Tip for Emacs Users
 
-If you lint your Perl code with the Perl interpreter using Flyheck you will need
-to determine if the buffer is part of a plx project so it runs Perl through Plx.
+If you lint your Perl code with the Perl interpreter using Flycheck, you will
+need to determine if the buffer is part of a plx project so it runs Perl through
+Plx.
 
 Use the following code to do this:
 
