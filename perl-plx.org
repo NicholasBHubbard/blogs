@@ -14,7 +14,7 @@ This is not a complete overview on everything that plx can do.
 * Why Plx?
 
 Imagine that you have a project that depends on a Perl version greater than that
-of your systems built in Perl. You will need to install the correct version of
+of your systems built-in Perl. You will need to install the correct version of
 Perl and figure out how to get your project to use this Perl instead of the
 system Perl.
 
