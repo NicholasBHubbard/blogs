@@ -73,7 +73,7 @@ To do this we must =cd= into the root directory of our project and run the
 following command.
 
 #+BEGIN_SRC
-plx --cpanm -Llocal Some::Module
+$ plx --cpanm -Llocal Some::Module
 #+END_SRC
 
 This will install =Some::Module= into a project local library located in a
