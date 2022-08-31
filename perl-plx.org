@@ -1,0 +1,129 @@
+# -*- mode:org;mode:auto-fill;fill-column:80 -*-
+#+title: Segregate Perl Projects with App::plx
+#+author: Nicholas Hubbard
+
+[[https://metacpan.org/pod/App::plx][App::plx]] (plx) is a tool for configuring per-project Perl development
+environments.
+
+Plx is not difficult to use and has very clear documentation. In this post
+I will give a brief overview of some of the problems that it solves and how to
+get started using it.
+
+This is not a complete overview on everything that plx can do.
+
+* Why Plx?
+
+Imagine that you have a project that depends on a Perl version greater than that
+of your systems built in Perl. You will need to install the correct version of
+Perl and figure out how to get your project to use this Perl instead of the
+system Perl.
+
+Next imagine a scenario where you are working on two different Perl projects
+that depend on a different version of the same CPAN module. You will need to
+figure out how to install both versions into different locations, and then you
+will need to figure out how to locate the correct version from the two different
+projects.
+
+These are two important problems that plx solves.
+
+* Installation
+
+Before you can use plx you must install plx.
+
+If you already have a CPAN installer, such as [[https://metacpan.org/pod/App::cpanminus][cpanminus]], then you should
+probably just use that to install plx.
+
+Plx can also be bootstrapped into a self contained script like so:
+
+#+BEGIN_SRC
+# wget https://raw.githubusercontent.com/shadowcat-mst/plx/master/bin/plx-packed -O /usr/local/bin/plx
+# chmod +x /usr/local/bin/plx
+#+END_SRC
+
+You can install plx into any directory, I just chose =/usr/local/bin= for
+simplicity. Just make sure you pick a directory that is in your [[https://en.wikipedia.org/wiki/PATH_(variable)][PATH]].
+
+* Initialization
+
+If you want to use plx for your Perl project you must first initialize the
+project to use plx. To do this we must =cd= into the root directory of the
+project and then execute plx with the =--init= flag.
+
+#+BEGIN_SRC
+$ plx --init /path/to/some/perl
+#+END_SRC
+
+This command sets up plx to use the Perl interpreter located in the given path.
+
+You can now execute your project code with a command like =plx --perl
+/path/to/project/script.pl=.
+
+This is how plx solves the first problem described in the =Why Plx?= section of
+this blog post. We can install any version of Perl onto our system and then
+configure plx to use this version to instead of the system perl to execute our
+projects code.
+
+* Installing CPAN Modules
+
+My favorite feature of plx is that it allows you to install modules off of CPAN
+into a [[https://metacpan.org/pod/local::lib][local::lib]] using [[https://metacpan.org/pod/App::cpanminus][cpanminus]]. This allows you to segragate your CPAN
+modules dependencies on a per-project basis.
+
+To do this we must =cd= into the root directory of our project and run the
+following command.
+
+#+BEGIN_SRC
+plx --cpanm -Llocal Some::Module
+#+END_SRC
+
+This will install =Some::Module= into a project local library located in a
+directory named =local/lib= at the root of the project directory.
+
+This solves the problem of two projects requiring different versions of the same
+CPAN module. If both projects use plx they can install simply install the
+desired version into their own local::lib.
+
+* Synopsis
+
+Plx is a tool for creating per-project virtual Perl environments. Plx lets us
+avoid a lot of headaches that come with developing multiple Perl projects on the
+same system.
+
+Everything Plx does can be done by combining features of other CPAN modules. Plx
+just brings together the functionality of these modules in a way that is easy to
+use and understand.
+
+* Bonus Tip for Emacs Users
+
+If you lint your Perl code with the Perl interpreter using Flyheck you will need
+to determine if the buffer is part of a plx project so it runs Perl through Plx.
+
+Use the following code to do this:
+
+#+BEGIN_SRC
+(require 'flycheck)
+(require 'projectile)
+
+(add-hook 'cperl-mode-hook 'flycheck-mode)
+(add-hook 'cperl-mode-hook 'my/cperl-select-correct-flycheck-checker)
+
+(flycheck-define-checker my/perl-plx
+  "A Perl syntax checker using the Perl interpreter with plx."
+  :command ("plx" "-w" "-c"
+            (option-list "-I" flycheck-perl-include-path)
+            (option-list "-M" flycheck-perl-module-list concat))
+  :standard-input t
+  :error-patterns
+  ((error line-start (minimal-match (message))
+          " at - line " line
+          (or "." (and ", " (zero-or-more not-newline))) line-end))
+  :modes (perl-mode cperl-mode))
+
+(defun my/cperl-select-correct-flycheck-checker ()
+  "If the current buffer is part of a plx project then use the `my/perl-plx'
+checker, otherwise use the `perl' checker."
+  (let ((proj-root (projectile-project-root)))
+    (if (and proj-root (file-directory-p (concat proj-root ".plx")))
+        (flycheck-select-checker 'my/perl-plx)
+      (flycheck-select-checker 'perl))))
+#+END_SRC
