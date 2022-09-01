@@ -60,15 +60,15 @@ $ plx --init /path/to/some/perl
 #+END_SRC
 
 When called with =perl= as the argument it sets up plx to use the first Perl
-in your PATH.
+in your [[https://en.wikipedia.org/wiki/PATH_(variable)][PATH]].
 
 #+BEGIN_SRC
 $ plx --init perl
 #+END_SRC
 
 The final and most exciting way to call =--init= is with a Perl version
-number. When called with a version number, plx will look for the given version
-of Perl first in your PATH and otherwise via [[https://perlbrew.pl/][Perlbrew]].
+number. When called with a version number, plx will look for a Perl of the given
+version first in your [[https://en.wikipedia.org/wiki/PATH_(variable)][PATH]] and otherwise via [[https://perlbrew.pl/][Perlbrew]].
 
 #+BEGIN_SRC
 $ plx --init 5.36.0
