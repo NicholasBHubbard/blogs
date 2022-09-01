@@ -119,7 +119,7 @@ your Bash shell.
 
 Now when you run plx from outside a dedicated plx project it will use =$HOME= as
 a sort of default plx project. You can use =--userstrap= to prevent needing to
-use your system Perl, and can instead always use plx.
+use your system Perl, so you and can instead always use plx.
 
 Note that =--userstrap= requires that you use a Bash shell.
 
