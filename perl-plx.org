@@ -53,7 +53,7 @@ project and then execute plx with the =--init= flag.
 The =--init= flag behaves differently depending on its argument.
 
 When =--init= is called with a file path, it assumes it is the path is to a Perl
-interpreter and sets up plx use it.
+interpreter and sets up plx to use it.
 
 #+BEGIN_SRC
 $ plx --init /path/to/some/perl
@@ -66,9 +66,9 @@ in your PATH.
 $ plx --init perl
 #+END_SRC
 
-The most exciting way to call =--init= is with a Perl version number. When
-called with a version number, plx will look for the given version of Perl first
-in your PATH and otherwise via [[https://perlbrew.pl/][Perlbrew]].
+The final and most exciting way to call =--init= is with a Perl version
+number. When called with a version number, plx will look for the given version
+of Perl first in your PATH and otherwise via [[https://perlbrew.pl/][Perlbrew]].
 
 #+BEGIN_SRC
 $ plx --init 5.36.0
@@ -94,19 +94,19 @@ following command.
 $ plx --cpanm -Llocal Some::Module
 #+END_SRC
 
-This will install =Some::Module= into a project local library located in a
-directory named =local/lib= at the root of the project directory.
+This will install =Some::Module= into a project-local library located in a
+directory named =local/lib= at the root of the project.
 
 This solves the problem of two projects requiring different versions of the same
-CPAN module. If both projects use plx they can simply install the desired
-version into their own local::lib.
+CPAN module. If both projects use plx they can simply install their desired
+version into a [[https://metacpan.org/pod/local::lib][local::lib]].
 
 * Userstrap
 
 What if you want to use your own Perl interpreter and a [[https://metacpan.org/pod/local::lib][local::lib]] when you are
-not working on a Plx project?
+working outside of a dedicated plx project?
 
-Plx has a =--userstrap= flag that will set this up automatically.
+Plx has a =--userstrap= flag that will set this up for you automatically.
 
 #+BEGIN_SRC
 $ plx --userstrap /path/to/some/perl
