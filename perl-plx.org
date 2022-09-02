@@ -2,21 +2,21 @@
 #+title: Segregate Perl Projects with App::plx
 #+author: Nicholas Hubbard
 
-[[https://metacpan.org/pod/App::plx][App::plx]] (plx) is a tool for configuring per-project Perl development
+[[https://metacpan.org/pod/App::plx][App::plx]] (Plx) is a tool for configuring per-project Perl development
 environments.
 
 Plx is not difficult to use and has very clear documentation. In this post
 I will give a brief overview of some of the problems that it solves and how to
 get started using it.
 
-This is not a complete overview on everything that plx can do.
+This is not a complete overview on everything that Plx can do.
 
 * Why Plx?
 
-Imagine that you have a project that depends on a Perl version greater than that
+Imagine you have a project that depends on a Perl version greater than that
 of your systems built-in Perl. You will need to install the correct version of
 Perl and figure out how to get your project to use this Perl instead of the
-system Perl.
+system's Perl.
 
 Next imagine a scenario where you are working on two different Perl projects
 that depend on a different version of the same CPAN module. You will need to
@@ -24,14 +24,14 @@ figure out how to install both versions into different locations, and then you
 will need to figure out how to locate the correct version from the two different
 projects.
 
-These are two important problems that plx solves.
+These are two important problems that Plx solves.
 
 * Installation
 
-Before you can use plx you must install plx.
+Before you can use Plx you must install Plx.
 
 If you already have a CPAN installer, such as [[https://metacpan.org/pod/App::cpanminus][cpanminus]], then you should
-probably just use that to install plx.
+probably just use that to install Plx.
 
 Plx can also be bootstrapped into a self contained script like so:
 
@@ -41,50 +41,50 @@ $ wget https://raw.githubusercontent.com/shadowcat-mst/plx/master/bin/plx-packed
 $ chmod +x "$HOME/bin/plx"
 #+END_SRC
 
-You can install plx into any directory, I just chose "$HOME/bin" for simplicity.
-Just make sure you pick a directory that is in your [[https://en.wikipedia.org/wiki/PATH_(variable)][PATH]].
+You can install Plx into any directory, I just chose "$HOME/bin" for simplicity.
+Just make sure you pick a directory in your [[https://en.wikipedia.org/wiki/PATH_(variable)][PATH]].
 
 * Initialization
 
-If you want to use plx for your Perl project, you must first initialize the
-project to use plx. To do this we must =cd= into the root directory of the
-project and then execute plx with the =--init= flag.
+If you want to use Plx for your Perl project, you must first initialize the
+project to use Plx. To do this we must =cd= into the root directory of the
+project and then execute Plx with the =--init= flag.
 
 The =--init= flag behaves differently depending on its argument.
 
 When =--init= is called with a file path, it assumes it is the path is to a Perl
-interpreter and sets up plx to use it.
+interpreter and sets up Plx to use it.
 
 #+BEGIN_SRC
 $ plx --init /path/to/some/perl
 #+END_SRC
 
-When called with =perl= as the argument it sets up plx to use the first Perl
-in your [[https://en.wikipedia.org/wiki/PATH_(variable)][PATH]].
+When called with =perl= as the argument it sets up Plx to use the first Perl in
+your [[https://en.wikipedia.org/wiki/PATH_(variable)][PATH]].
 
 #+BEGIN_SRC
 $ plx --init perl
 #+END_SRC
 
 The final and most exciting way to call =--init= is with a Perl version
-number. When called with a version number, plx will look for a Perl of the given
+number. When called with a version number, Plx will look for a Perl of the given
 version first in your [[https://en.wikipedia.org/wiki/PATH_(variable)][PATH]] and otherwise via [[https://perlbrew.pl/][Perlbrew]].
 
 #+BEGIN_SRC
 $ plx --init 5.36.0
 #+END_SRC
 
-After initializing plx you can execute your project code with a command like
-=plx /path/to/project/script.pl=, and plx will execute the script with the Perl
-interpreter you specified with the =plx --init= command.
+After initializing Plx you can execute your project code with a command like
+=$ plx /path/to/project/script.pl=, and Plx will execute the script with the
+Perl interpreter you specified with the =plx --init= command.
 
-This is how plx solves the problem of needing to use a different Perl than your
+This is how Plx solves the problem of needing to use a different Perl than your
 systems built-in Perl.
 
 * Installing CPAN Modules
 
-My favorite feature of plx is that it allows you to install modules off of CPAN
-into a [[https://metacpan.org/pod/local::lib][local::lib]] using [[https://metacpan.org/pod/App::cpanminus][cpanminus]]. This allows you to segragate your CPAN
+My favorite feature of Plx is that it allows you to install modules off of CPAN
+into a [[https://metacpan.org/pod/local::lib][local::lib]] using [[https://metacpan.org/pod/App::cpanminus][cpanminus]]. This allows you to segregate your CPAN
 modules dependencies on a per-project basis.
 
 To do this we must =cd= into the root directory of our project and run the
@@ -98,13 +98,13 @@ This will install =Some::Module= into a project-local library located in a
 directory named =local/lib= at the root of the project.
 
 This solves the problem of two projects requiring different versions of the same
-CPAN module. If both projects use plx they can simply install their desired
+CPAN module. If both projects use Plx they can simply install their desired
 version into a [[https://metacpan.org/pod/local::lib][local::lib]].
 
 * Userstrap
 
 What if you want to use your own Perl interpreter and a [[https://metacpan.org/pod/local::lib][local::lib]] when you are
-working outside of a dedicated plx project?
+working outside of a dedicated Plx project?
 
 Plx has a =--userstrap= flag that will set this up for you automatically.
 
@@ -112,24 +112,24 @@ Plx has a =--userstrap= flag that will set this up for you automatically.
 $ plx --userstrap /path/to/some/perl
 #+END_SRC
 
-Calling =--userstrap= essentially sets up your =$HOME= to be a plx project and
+Calling =--userstrap= essentially sets up your =$HOME= to be a Plx project and
 sets up a [[https://metacpan.org/pod/local::lib][local::lib]] in =$HOME/perl5=, installs [[https://metacpan.org/pod/App::plx][App::plx]] and [[https://metacpan.org/pod/App::cpanminus][App::cpanminus]] into
-the local::lib, and adds a line to your =$HOME/.bashrc= that sets up plx for
+the local::lib, and adds a line to your =$HOME/.bashrc= that sets up Plx for
 your Bash shell.
 
-Now when you run plx from outside a dedicated plx project it will use =$HOME= as
-a sort of default plx project. You can use =--userstrap= to prevent needing to
-use your system Perl, so you and can instead always use plx.
+Now when you run Plx from outside a dedicated Plx project it will use =$HOME= as
+a sort of default Plx project. You can use =--userstrap= to prevent needing to
+use your system Perl, so you and can instead always use Plx.
 
 Note that =--userstrap= requires that you use a Bash shell.
 
 * Plx is For Everybody
 
-Plx is designed to not only provide a nice experience for Perl developers but
-also to be usable by a sysadmin that isn't a Perl expert. Therefore plx is
+Plx is designed to not only provide a nice experience for Perl developers, but
+also to be usable by a sysadmin that isn't a Perl expert. Therefore Plx is
 configured through simple text files that can be manipulated by hand, and allows
-multiple commands to be run in a single plx invocation via the =--multi= flag,
-which makes scripting plx cleaner.
+multiple commands to be run in a single Plx invocation via the =--multi= flag,
+which makes scripting Plx cleaner.
 
 * Synopsis
 
@@ -138,16 +138,16 @@ avoid a lot of headaches that come with developing multiple Perl projects on the
 same system.
 
 A lot of what Plx does can be done by combining features of other CPAN modules,
-but plx brings together these functionalities in a way that is easy to use and
+but Plx brings together these functionalities in a way that is easy to use and
 understand.
 
-This blog post is only a brief introduction to plx. Please go on to read the
+This blog post is only a brief introduction to Plx. Please go on to read the
 manual for more a more detailed overview of its features.
 
 * Bonus Tip for Emacs Users
 
 If you lint your Perl code with the Perl interpreter using Flycheck, you will
-need to determine if the buffer is part of a plx project so it runs the Perl
+need to determine if the buffer is part of a Plx project so it runs the Perl
 interpreter through Plx.
 
 Use the following code to do this:
