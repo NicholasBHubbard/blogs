@@ -15,13 +15,13 @@ Lets write a simple (and useless) daemon that logs the current time every 5 minu
 
 First we need a function to write the time to the current log file.
 
-sub append_time {
-    my $logfile = "$ENV{HOME}/times.txt";
-    open my $fh, '>>', $logfile or die "cannot open file '$logfile': $!";
-    my $time = localtime();
-    print $fh "$time\n";
-    close $fh;
-}
+    sub append_time {
+        my $logfile = "$ENV{HOME}/times.txt";
+        open my $fh, '>>', $logfile or die "cannot open file '$logfile': $!";
+        my $time = localtime();
+        print $fh "$time\n";
+        close $fh;
+    }
 
 Next we need a function to rotate the old log files.
 
