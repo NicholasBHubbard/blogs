@@ -59,7 +59,7 @@ my $cron_daemon = Schedule::Cron->new(
 );
 ```
 
-The most important [Schedule::Cron](https://metacpan.org/pod/Schedule::Cron) method is [add<sub>entry</sub>](https://metacpan.org/pod/Schedule::Cron#$cron-%3Eadd_entry($timespec,[arguments])), which takes a cron string and a coderef. When we eventually run the daemon it will schedule the coderef to be run at the interval specified by the cron string.
+The most important [Schedule::Cron](https://metacpan.org/pod/Schedule::Cron) method is [add_entry](https://metacpan.org/pod/Schedule::Cron#$cron-%3Eadd_entry($timespec,[arguments])), which takes a cron string and a coderef. When we eventually run the daemon it will schedule the coderef to be run at the interval specified by the cron string.
 
 Personally I can never remember the syntax for cron strings. I use the website [crontab.guru](https://crontab.guru/) for getting an English translation of what my cron string means, which makes it easy to build my cron strings.
 
@@ -85,4 +85,4 @@ my $pid = $cron_daemon->run(detach => 1);
 print "started the time-daemon as pid $pid\n";
 ```
 
-That's all there is to it! The basic recipe to follow is: initialize a [Schedule::Cron](https://metacpan.org/pod/Schedule::Cron) object, schedule subroutines to be run with [add<sub>entry</sub>](https://metacpan.org/pod/Schedule::Cron#$cron-%3Eadd_entry($timespec,[arguments])), then start the daemon with the [run](https://metacpan.org/pod/Schedule::Cron#$cron-%3Erun([options])) method.
+That's all there is to it! The basic recipe to follow is: initialize a [Schedule::Cron](https://metacpan.org/pod/Schedule::Cron) object, schedule subroutines to be run with [add_entry](https://metacpan.org/pod/Schedule::Cron#$cron-%3Eadd_entry($timespec,[arguments])), then start the daemon with the [run](https://metacpan.org/pod/Schedule::Cron#$cron-%3Erun([options])) method.
