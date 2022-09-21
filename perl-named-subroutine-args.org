@@ -37,7 +37,7 @@ my $fh = safe_open('/file/that/doesnt/exist', '>', 0);
 print $fh "Hello, World!\n";
 
 # OUTPUT:
-print() on closed filehandle $fh at ./scratch.pl line 22.
+# print() on closed filehandle $fh at ./scratch.pl line 22.
 #+END_SRC
 
 We can see that the third argument allows us to optionally control if
@@ -81,7 +81,7 @@ my $fh = safe_open(FILE => '/file/that/doesnt/exist', MODE => '>', OR_DIE => 1);
 print $fh "Hello, World!\n";
 
 # OUTPUT:
-error: failed to open '/file/that/doesnt/exist': No such file or directory
+# error: failed to open '/file/that/doesnt/exist': No such file or directory
 #+END_SRC
 
 #+BEGIN_SRC
@@ -89,7 +89,7 @@ my $fh = safe_open(FILE => '/file/that/doesnt/exist', MODE => '>');
 print $fh "Hello, World!\n";
 
 # OUTPUT:
-error: failed to open '/file/that/doesnt/exist': No such file or directory
+# error: failed to open '/file/that/doesnt/exist': No such file or directory
 #+END_SRC
 
 #+BEGIN_SRC
@@ -97,7 +97,7 @@ my $fh = safe_open(OR_DIE => 0, FILE => '/file/that/doesnt/exist', MODE => '>');
 print $fh "Hello, World!\n";
 
 # OUTPUT:
-print() on closed filehandle $fh at ./scratch.pl line 25.
+# print() on closed filehandle $fh at ./scratch.pl line 25.
 #+END_SRC
 
 There are a few things to note from these examples.
@@ -106,3 +106,20 @@ There are a few things to note from these examples.
   + The argument order does not matter.
   + The OR_DIE argument is optional and defaults to true.
 
+The reason why our subroutine has these features is due to the
+strategy we used for construction the =%args= hash. Because hash keys
+must be unique, we first set the default values of the keys which will
+be overridden if the argument list redefines them. The following code
+shows how hash keys are overriden.
+
+#+BEGIN_SRC
+my %hash = (
+    FOO => 12,
+    FOO => 13
+);
+
+print $hash{FOO}, "\n";
+
+# OUTPUT:
+# 13
+#+END_SRC
