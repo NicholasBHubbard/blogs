@@ -43,7 +43,7 @@ print $fh "Hello, World!\n";
 #+END_SRC
 
 Imagine if somebody who has never worked with this code before comes
-across these calls to =safe_open=. It will be impossible for them
+across these calls to =&safe_open=. It will be impossible for them
 to know what the third argument stands for unless they go and look at
 the actual code of the subroutine.
 
