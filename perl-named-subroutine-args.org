@@ -3,7 +3,8 @@
 #+author: Nicholas Hubbard
 
 Naming your subroutine arguments has benefits around increasing the
-readability of your code. Lets look at an example:
+readability of your code. Lets look at an example of code that can
+benefit from named arguments:
 
 #+BEGIN_SRC
 sub safe_open {
