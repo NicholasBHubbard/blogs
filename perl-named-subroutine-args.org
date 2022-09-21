@@ -104,7 +104,7 @@ There are a few things to note from these examples.
 
   + The arguments are given names.
   + The argument order does not matter.
-  + The OR_DIE argument is optional and defaults to true.
+  + The =OR_DIE= argument is optional and defaults to true.
 
 The reason why our subroutine has these features is due to the
 strategy we used for construction the =%args= hash. Because hash keys
