@@ -9,13 +9,13 @@ benefit from named arguments:
 #+BEGIN_SRC
 sub safe_open {
 
-    my $file   = shift;
-    my $mode   = shift;
-    my $or_die = shift;
+    my $file = shift @_;
+    my $mode = shift @_;
+    my $die_on_failure = shift @_;
 
     my $success = open(my $fh, $mode, $file);
 
-    if (not $success and $or_die) {
+    if ((not $success) and $die_on_failure) {
         die "error: failed to open '$file': $!\n";
     }
 
@@ -54,18 +54,18 @@ arguments, we can name them!
 sub safe_open {
 
     my %args = (
-        FILE   => '',
-        MODE   => '',
-        OR_DIE => 1,
+        FILE => '',
+        MODE => '',
+        DIE_ON_FAILURE => 1,
         @_
     );
 
-    $args{FILE} or die "error: forgot FILE arg in call to &safe_open\n";
-    $args{MODE} or die "error: forgot MODE arg in call to &safe_open\n";
+    $args{FILE} or die "error: missing FILE arg in call to &safe_open\n";
+    $args{MODE} or die "error: missing MODE arg in call to &safe_open\n";
 
     my $success = open(my $fh, $args{MODE}, $args{FILE});
 
-    if (not $success and $args{OR_DIE}) {
+    if ((not $success) and $args{DIE_ON_FAILURE}) {
         die "error: failed to open '$args{FILE}': $!\n";
     }
 
@@ -76,7 +76,7 @@ sub safe_open {
 Lets look at examples of calling this subroutine:
 
 #+BEGIN_SRC
-my $fh = safe_open(FILE => '/file/that/doesnt/exist', MODE => '>', OR_DIE => 1);
+my $fh = safe_open(FILE => '/file/that/doesnt/exist', MODE => '>', DIE_ON_FAILURE => 1);
 print $fh "Hello, World!\n";
 
 # OUTPUT:
@@ -92,7 +92,7 @@ print $fh "Hello, World!\n";
 #+END_SRC
 
 #+BEGIN_SRC
-my $fh = safe_open(OR_DIE => 0, FILE => '/file/that/doesnt/exist', MODE => '>');
+my $fh = safe_open(DIE_ON_FAILURE => 0, FILE => '/file/that/doesnt/exist', MODE => '>');
 print $fh "Hello, World!\n";
 
 # OUTPUT:
@@ -103,7 +103,7 @@ There are a few things to note from these examples.
 
   + The arguments must be explicitly named using =ARG => value= syntax.
   + The argument order does not matter.
-  + The =OR_DIE= argument is optional and defaults to true.
+  + The =DIE_ON_FAILURE= argument is optional and defaults to true.
 
 Our =&safe_open= subroutine has these features because of the strategy
 used for constructing the =%args= hash.
@@ -129,10 +129,10 @@ print "\$hash{'bar'} = $hash{'bar'}\n";
 # $hash{'bar'} = 13
 #+END_SRC
 
-We are able to give default argument values because of the fact that
-if a hash definition defines the same key multiple times, the last
-definition is used. If the user leaves off an argument, it is not
-redefined and stays set to the default. Consider this example:
+We are able to give default argument values because of the fact that,
+if a hash definition defines the same key multiple times, then the
+last definition is used. If the user leaves off an argument, then it
+is not redefined and stays set to the default. Consider this example:
 
 #+BEGIN_SRC
 my %hash = (
@@ -148,8 +148,8 @@ print "\$hash{'FOO'} = $hash{'FOO'}\n";
 
 * Synopsis
 
-We can use a subroutines argument array (=@_=) to construct a hash,
+We can use the subroutines argument array (=@_=) to construct a hash,
 which can give us significant benefits in terms of code readability.
-By constructing a hash from the argument array, calls to the
-subroutine must explicitly name their arguments, the argument order
+By constructing a hash from the argument array, all calls to the
+subroutine must explicitly name their arguments the argument order
 becomes irrelevant, and arguments can be given default values.
