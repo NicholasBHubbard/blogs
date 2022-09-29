@@ -90,7 +90,7 @@ To avoid this problem we will write =&retrieve_html= to first check for the
 existence of a lock file, and if it exists waits for it to be deleted before
 continuing. If the lock file doesn't exist then it creates it before retrieving
 and writing the HTML, and deletes it afterwards. This guarantees that multiple
-instances or =duckduckperl retrieve= terminate in the order they were called.
+instances of =duckduckperl retrieve= terminate in the order they were called.
 
 Perl's built-in [[https://perldoc.perl.org/File::Temp][File::Temp]] module provides useful features for creating a lock
 file. The most important feature that we will use is automatic deletion of the
