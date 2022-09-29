@@ -1,0 +1,124 @@
+A [lock](https://en.wikipedia.org/wiki/Lock_(computer_science)) can serve many purposes in regards to avoiding [race conditions](https://en.wikipedia.org/wiki/Race_condition). In this article we will explore how to implement a lock using Perl's built-in [File::Temp](https://perldoc.perl.org/File::Temp) module.
+
+
+<a id="org43fe6db"></a>
+
+# The Problem
+
+We will write a program called "duckduckperl" that has the following usage:
+
+    usage: duckduckperl [retrieve] [print]
+
+The `retrieve` command retrieves the HTML of a DuckDuckGo search for the word "perl", and writes it to `$HOME/duckduckperl.html`, overwriting this file if it already exists.
+
+The `print` command prints the content of `$HOME/duckduckperl.html`.
+
+Here is a version of the program that has a potential race condition:
+
+```perl
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $OUTPUT_FILE = "$ENV{HOME}/duckduckperl.html";
+
+my $USAGE = 'usage: duckduckperl [retrieve] [print]' . "\n";
+
+(@ARGV == 1) or die $USAGE;
+
+my $ARG = $ARGV[0];
+
+if    ($ARG eq 'retrieve') { retrieve_html() }
+elsif ($ARG eq 'print'   ) { print_html()    }
+else                       { die $USAGE      }
+
+sub retrieve_html {
+
+    my $html = `curl --silent https://duckduckgo.com/?q=perl`;
+
+    unless ($? == 0) {
+        die "duckduckperl: curl command exited with status $?\n";
+    }
+
+    open my $fh, '>', $OUTPUT_FILE
+      or die "duckduckperl: error: cannot open $OUTPUT_FILE: $!\n";
+
+    print $fh $html;
+
+    close $fh;
+}
+
+sub print_html {
+
+    -f $OUTPUT_FILE
+      or die "duckduckperl: error: cannot find file $OUTPUT_FILE\n";
+
+    open my $fh, '<', $OUTPUT_FILE
+      or die "duckduckperl: error: cannot open $OUTPUT_FILE: $!\n";
+
+    my $html = <$fh>;
+
+    close $fh;
+
+    print $html;
+}
+```
+
+The only part of this code that is important to understand is the `&retrieve_html` subroutine, because this is where the potential race condition comes from. This subroutine `curl`'s the URL that represents a DuckDuckGo search of the word "perl", and dies if it fails. If the `curl` command succeeds it writes the outputted HTML `$HOME/duckduckperl.html`, overwriting any data already in the file.
+
+Imagine if we call `duckduckperl retrieve` twice, and for whatever (network related) reason the second instance finishes first. When we go to call `duckduckperl print`, we will get the output of the first call instead of the second call, which probably is not expected.
+
+
+<a id="orgbeeef69"></a>
+
+# The Solution
+
+To avoid this problem we will write `&retrieve_html` to first check for the existence of a lock file, and if it exists waits for it to be deleted before continuing. If the lock file doesn't exist then it creates it before retrieving and writing the HTML, and deletes it afterwards. This guarantees that multiple
+instances of `duckduckperl retrieve` terminate in the order they were called.
+
+Perl's built-in [File::Temp](https://perldoc.perl.org/File::Temp) module provides useful features for creating a lock file. The most important feature that we will use is automatic deletion of the lock file when the File::Temp object is destroyed (garbage collected). This feature is available if we use [File::Temp's OO interface](https://perldoc.perl.org/File::Temp#OBJECT-ORIENTED-INTERFACE).
+
+Here is the updated version of `&retrieve_html` that uses a lock file:
+
+```perl
+use File::Temp;
+
+sub retrieve_html {
+
+    my $seconds = 0;
+    while (grep /DUCKDUCKPERLLOCK$/, glob('/tmp/*')) {
+        if ($seconds > 120) {
+            die 'duckduckperl: error: aborting after waiting 2 minutes for lock file to be deleted' . "\n";
+        }
+        sleep 1;
+        $seconds++;
+    }
+
+    my $lock_fh = File::Temp->new(
+        DIR      => '/tmp',
+        TEMPLATE => 'XXXX',
+        SUFFIX   => '.DUCKDUCKPERLLOCK',
+        UNLINK   => 1
+    );
+
+    open my $fh, '>', $OUTPUT_FILE
+      or die "duckduckperl: error: cannot open $OUTPUT_FILE: $!\n";
+
+    my $html = `curl --silent https://duckduckgo.com/?q=perl`;
+
+    unless ($? == 0) {
+        die "duckduckperl: curl command exited with status $?\n";
+    }
+
+    print $fh $html;
+
+    close $fh;
+}
+```
+
+The first part of the subroutine checks for the lock file, which is a file in the `/tmp` directory matching the regex `/DUCKDUCKPERLLOCK$/`. If this file exists, we check every second for the next 2 minutes to see if it is deleted, before giving up and exiting the program. If the lock file does not exist, then we create it using [File::Temp::new](https://perldoc.perl.org/File::Temp#new).
+
+We configure our File::Temp object with 4 options. The `DIR` option specifies the directory that we want to place the file in. The `TEMPLATE` option specifies the template to be used for naming the file. The `X`'s represents random characters that File::Temp will fill in to guarantee the file it creates has a unique name. The `SUFFIX` option gives the file name a suffix, which we set to `.DUCKDUCKPERLLOCK`. We use this suffix to identify the lock file when checking for its existence. Finally, the `UNLINK` option specifies that we want to delete the file when the File::Temp object is destroyed (garbage collected). Conveniently, even if the `curl` command fails and we make the program die, the File::Temp object is still destroyed, and the lock file is deleted.
+
+Using this version of `&retrieve_html`, we can rest assured knowing that multiple instances of `duckduckperl retrieve` will terminate in the order they were invoked.
