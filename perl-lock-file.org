@@ -82,14 +82,14 @@ already in the file.
 Imagine if we call =duckduckperl retrieve= twice, and for whatever (network
 related) reason the second instance finishes first. When we go to call
 =duckduckperl print=, we will get the output of the first call instead of the
-second call, which probably isn't expected.
+second call, which probably is not expected.
 
 * The Solution
 
 To avoid this problem we will write =&retrieve_html= to first check for the
 existence of a lock file, and if it exists waits for it to be deleted before
 continuing. If the lock file doesn't exist then it creates it before retrieving
-the and writing the HTML, and deletes it afterwards. This guarentees that
+the and writing the HTML, and deletes it afterwards. This guarantees that
 multiple instances or =duckduckperl retrieve= terminate in the order they were
 called.
 
@@ -141,13 +141,13 @@ sub retrieve_html {
 The first part of the subroutine checks for the lock file, which is a file
 in the =/tmp= directory matching the regex =/DUCKDUCKPERLLOCK$/=. If this file
 exists, we check to see if it is deleted every second for the next 2 minutes
-before giving up and killing the program. If the lock file doesn't exist, then
+before giving up and killing the program. If the lock file does not exist, then
 we create it using [[https://perldoc.perl.org/File::Temp#new][File::Temp::new]].
 
 We configure our File::Temp object with 4 options. The =DIR= option specifies
 the directory that we want to place the file in. The =TEMPLATE= option specifies
 the template to be used for naming the file. The =X='s represents random
-characters that File::Temp will fill in to guarentee the file it creates has a
+characters that File::Temp will fill in to guarantee the file it creates has a
 unique name. The =SUFFIX= option gives the file name a suffix, which we set to
 =.DUCKDUCKPERLLOCK=. We use this suffix to identify the lock file when checking
 for its existence. Finally, the =UNLINK= option specifies that we want to delete
