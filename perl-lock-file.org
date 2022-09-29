@@ -3,7 +3,7 @@
 #+author: Nicholas Hubbard
 
 A [[https://en.wikipedia.org/wiki/Lock_(computer_science)][lock]] can serve many purposes in regards to avoiding [[https://en.wikipedia.org/wiki/Race_condition][race conditions]]. In this
-article we will explore how to implement a lock using Perls built-in [[https://perldoc.perl.org/File::Temp][File::Temp]]
+article we will explore how to implement a lock using Perl's built-in [[https://perldoc.perl.org/File::Temp][File::Temp]]
 module.
 
 * The Problem
@@ -30,9 +30,9 @@ use warnings;
 
 my $OUTPUT_FILE = "$ENV{HOME}/duckduckperl.html";
 
-my $USAGE = 'usage: duckduckperl [retrieve] [print]'."\n";
+my $USAGE = 'usage: duckduckperl [retrieve] [print]' . "\n";
 
-1 == @ARGV or die $USAGE;
+(@ARGV == 1) or die $USAGE;
 
 my $ARG = $ARGV[0];
 
@@ -44,7 +44,7 @@ sub retrieve_html {
 
     my $html = `curl --silent https://duckduckgo.com/?q=perl`;
 
-    unless (0 == $?) {
+    unless ($? == 0) {
         die "duckduckperl: curl command exited with status $?\n";
     }
 
@@ -89,11 +89,10 @@ second call, which probably is not expected.
 To avoid this problem we will write =&retrieve_html= to first check for the
 existence of a lock file, and if it exists waits for it to be deleted before
 continuing. If the lock file doesn't exist then it creates it before retrieving
-the and writing the HTML, and deletes it afterwards. This guarantees that
-multiple instances or =duckduckperl retrieve= terminate in the order they were
-called.
+and writing the HTML, and deletes it afterwards. This guarantees that multiple
+instances or =duckduckperl retrieve= terminate in the order they were called.
 
-Perls built-in [[https://perldoc.perl.org/File::Temp][File::Temp]] module provides useful features for creating a lock
+Perl's built-in [[https://perldoc.perl.org/File::Temp][File::Temp]] module provides useful features for creating a lock
 file. The most important feature that we will use is automatic deletion of the
 lock file when the File::Temp object is destroyed (garbage collected). This
 feature is available if we use [[https://perldoc.perl.org/File::Temp#OBJECT-ORIENTED-INTERFACE][File::Temp's OO interface]].
@@ -108,12 +107,10 @@ sub retrieve_html {
     my $seconds = 0;
     while (grep /DUCKDUCKPERLLOCK$/, glob('/tmp/*')) {
         if ($seconds > 120) {
-            die 'duckduckperl: error: aborting after waiting for lock file to be deleted for 2 minutes'."\n";
+            die 'duckduckperl: error: aborting after waiting 2 minutes for lock file to be deleted' . "\n";
         }
-        else {
-            sleep 1;
-            $seconds++;
-        }
+        sleep 1;
+        $seconds++;
     }
 
     my $lock_fh = File::Temp->new(
@@ -128,7 +125,7 @@ sub retrieve_html {
 
     my $html = `curl --silent https://duckduckgo.com/?q=perl`;
 
-    unless (0 == $?) {
+    unless ($? == 0) {
         die "duckduckperl: curl command exited with status $?\n";
     }
 
@@ -138,10 +135,10 @@ sub retrieve_html {
 }
 #+END_SRC
 
-The first part of the subroutine checks for the lock file, which is a file
-in the =/tmp= directory matching the regex =/DUCKDUCKPERLLOCK$/=. If this file
-exists, we check to see if it is deleted every second for the next 2 minutes
-before giving up and killing the program. If the lock file does not exist, then
+The first part of the subroutine checks for the lock file, which is a file in
+the =/tmp= directory matching the regex =/DUCKDUCKPERLLOCK$/=. If this file
+exists, we check every second for the next 2 minutes to see if it is deleted,
+before giving up and exiting the program. If the lock file does not exist, then
 we create it using [[https://perldoc.perl.org/File::Temp#new][File::Temp::new]].
 
 We configure our File::Temp object with 4 options. The =DIR= option specifies
@@ -152,7 +149,7 @@ unique name. The =SUFFIX= option gives the file name a suffix, which we set to
 =.DUCKDUCKPERLLOCK=. We use this suffix to identify the lock file when checking
 for its existence. Finally, the =UNLINK= option specifies that we want to delete
 the file when the File::Temp object is destroyed (garbage collected).
-Conveniently, even if the =curl= command fails and we kill the program, the
+Conveniently, even if the =curl= command fails and we make the program die, the
 File::Temp object is still destroyed, and the lock file is deleted.
 
 Using this version of =&retrieve_html=, we can rest assured knowing that
