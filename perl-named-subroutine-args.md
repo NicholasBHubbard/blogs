@@ -1,0 +1,135 @@
+Naming your subroutine arguments has benefits around increasing the readability of your code. Lets look at an example of code that can benefit from named arguments:
+
+```perl
+sub safe_open {
+
+    my $file = shift @_;
+    my $mode = shift @_;
+    my $die_on_failure = shift @_;
+
+    my $success = open(my $fh, $mode, $file);
+
+    if ((not $success) and $die_on_failure) {
+        die "error: failed to open '$file': $!\n";
+    }
+
+    return $fh;
+}
+```
+
+In the following examples we can see that the third argument allows us to control if we should kill the program if the file cannot be opened:
+
+```perl
+my $fh = safe_open('/file/that/doesnt/exist', '>', 1);
+print $fh "Hello, World!\n";
+
+# OUTPUT:
+# error: failed to open '/file/that/doesnt/exist': No such file or directory
+```
+
+```perl
+my $fh = safe_open('/file/that/doesnt/exist', '>', 0);
+print $fh "Hello, World!\n";
+
+# OUTPUT:
+# print() on closed filehandle $fh at ./scratch.pl line 22.
+```
+
+Imagine if somebody who has never worked with this code before comes across these calls to `&safe_open`. It will be impossible for them to know what the third argument stands for unless they go and look at the actual code of the subroutine.
+
+To make it easier for people to understand the meaning of the arguments, we can name them!
+
+```perl
+sub safe_open {
+
+    my %args = (
+        FILE => '',
+        MODE => '',
+        DIE_ON_FAILURE => 1,
+        @_
+    );
+
+    $args{FILE} or die "error: missing FILE arg in call to &safe_open\n";
+    $args{MODE} or die "error: missing MODE arg in call to &safe_open\n";
+
+    my $success = open(my $fh, $args{MODE}, $args{FILE});
+
+    if ((not $success) and $args{DIE_ON_FAILURE}) {
+        die "error: failed to open '$args{FILE}': $!\n";
+    }
+
+    return $fh;
+}
+```
+
+Lets look at some examples of calling this subroutine:
+
+```perl
+my $fh = safe_open(FILE => '/file/that/doesnt/exist', MODE => '>', DIE_ON_FAILURE => 1);
+print $fh "Hello, World!\n";
+
+# OUTPUT:
+# error: failed to open '/file/that/doesnt/exist': No such file or directory
+```
+
+```perl
+my $fh = safe_open(FILE => '/file/that/doesnt/exist', MODE => '>');
+print $fh "Hello, World!\n";
+
+# OUTPUT:
+# error: failed to open '/file/that/doesnt/exist': No such file or directory
+```
+
+```perl
+my $fh = safe_open(DIE_ON_FAILURE => 0, FILE => '/file/that/doesnt/exist', MODE => '>');
+print $fh "Hello, World!\n";
+
+# OUTPUT:
+# print() on closed filehandle $fh at ./scratch.pl line 25.
+```
+
+There are a few things to note from these examples.
+
+-   The arguments must be explicitly named using `ARG => value` syntax.
+-   The argument order does not matter.
+-   The `DIE_ON_FAILURE` argument is optional and defaults to true.
+
+Our `&safe_open` subroutine has these features because of the strategy used for constructing the `%args` hash.
+
+The reason the argument order doesn't matter is because hashes are unordered and in the end we are constructing a hash out of the argument list.
+
+An array can be used to construct a hash as long as it has an even number of elements. We leverage this to use the `@_` array to construct the `%args` hash. Here is an example of this behavior:
+
+```perl
+my @array = ('foo', 12, 'bar', 13);
+
+my %hash = @array;
+
+print "\$hash{'foo'} = $hash{'foo'}\n";
+print "\$hash{'bar'} = $hash{'bar'}\n";
+
+# OUTPUT:
+# $hash{'foo'} = 12
+# $hash{'bar'} = 13
+```
+
+We are able to give default argument values because of the fact that, if a hash definition defines the same key multiple times, then the last definition is used. If the user leaves off an argument, then it is not redefined and stays set to the default. Consider this example:
+
+```perl
+my %hash = (
+    FOO => 12,
+    FOO => 13
+);
+
+print "\$hash{'FOO'} = $hash{'FOO'}\n";
+
+# OUTPUT:
+# $hash{'FOO'} = 13
+```
+
+
+<a id="orgae697ad"></a>
+
+# Synopsis
+
+We can use the subroutines argument array (`@_`) to construct a hash, which can give us significant benefits in terms of code readability. By constructing a hash from the argument array, all calls to the subroutine must explicitly name their arguments the argument order becomes irrelevant, and arguments can be given default values.
