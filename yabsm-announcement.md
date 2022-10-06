@@ -102,11 +102,11 @@ Please note that there is also a `weekly` and `monthly` timeframe category.
 
 I define one [ssh_backup](https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#SSH-Backups) named *slackmac* that backs up my system to my old MacBook running Slackware.
 
-The *ssh<sub>dest</sub>* value is set to *slackmac*, which is a host defined in the *yabsm* user's `$HOME/.ssh/config` file. (Yabsm runs as a daemon process, using the special username `yabsm`.)
+The *ssh_dest* value is set to *slackmac*, which is a host defined in the *yabsm* user's `$HOME/.ssh/config` file. (Yabsm runs as a daemon process, using the special username `yabsm`.)
 
 The *dir* value is set to the directory on *slackmac* where the backups will be located.
 
-I perform this *ssh<sub>backup</sub>* only in the *daily* timeframe category, backing up every night at midnight. I keep 365 of these backups so I can go back an entire year.
+I perform this *ssh_backup* only in the *daily* timeframe category, backing up every night at midnight. I keep 365 of these backups so I can go back an entire year.
 
 
 <a id="orgc5909cb"></a>
@@ -117,14 +117,14 @@ I define one [local_backup](https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#L
 
 The hard drive is mounted at `/mnt/easystore`, and I keep my backups in the `/backups/yabsm-slacktop` directory on the hard drive.
 
-Just like my `slackmac` *ssh<sub>backup</sub>*, I perform my *local<sub>backup</sub>* only in the `daily` timeframe category, every night at midnight.
+Just like my `slackmac` *ssh_backup*, I perform my *local_backup* only in the `daily` timeframe category, every night at midnight.
 
 
 <a id="orgb9f813e"></a>
 
 # Finding Snapshots
 
-Yabsm provides the [find](https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#Finding-Snapshots) command that I use to jump around to different snapshots and backups. The *find* command takes two arguments, the first is the name of any of your *snaps*, *ssh<sub>backups</sub>*, or *local<sub>backups</sub>*. The second argument is a query. The different kinds of queries are all documented in the link above.
+Yabsm provides the [find](https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#Finding-Snapshots) command that I use to jump around to different snapshots and backups. The *find* command takes two arguments, the first is the name of any of your *snaps*, *ssh_backups*, or *local_backups*. The second argument is a query. The different kinds of queries are all documented in the link above.
 
 Instead of repeating the documentation, let's break down a practical example of the *find* command's usage.
 
