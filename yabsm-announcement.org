@@ -77,8 +77,8 @@ local_backup easystore {
 *** Yabsm Dir
 
 I use the traditional =/.snapshots/yabsm= directory as my /yabsm_dir/, which is
-the location that my snapshots will reside, and Yabsm will use for storing data
-neccesary for performing SSH and local backups.
+the location that my snapshots will reside. Yabsm will also use this dir for
+storing data neccesary for performing SSH and local backups.
 
 *** Subvol
 
