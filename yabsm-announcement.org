@@ -149,7 +149,9 @@ How many times have you broken code that worked 30 minutes ago? Because I take
 
 An example:
 
-= $ diff $HOME/projects/foo/foo.sh "$(yabsm find root back-30-mins)/$HOME/projects/foo/script.sh" =
+#+BEGIN_SRC
+$ diff $HOME/projects/foo/foo.sh "$(yabsm find root back-30-mins)/$HOME/projects/foo/script.sh"
+#+END_SRC
 
 This command will show the =diff= output of the =$HOME/projects/foo/foo.sh=
 file with this same file that was snapshotted 30 minutes ago. We can use this
