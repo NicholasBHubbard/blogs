@@ -1,0 +1,192 @@
+# -*- mode:org;mode:auto-fill;fill-column:80 -*-
+#+title: How I use Yabsm to Manage my Btrfs Snapshots
+#+author: Nicholas Hubbard
+
+I am the author of [[https://metacpan.org/dist/App-Yabsm/view/bin/yabsm][Yabsm (yet another btrfs snapshot manager)]], and I will
+explain how I use Yabsm to manage my btrfs snapshots.
+
+This article is meant to supplement the official documentation linked above, and
+assumes a basic understanding of Linux's [[https://en.wikipedia.org/wiki/Btrfs][btrfs]] filesystem.
+
+Please note that Yabsm can be configured to suit many different use cases other
+than the one described here.
+
+* Snapshots vs Backups
+
+Before we go on lets clear up the difference between a snapshot and a backup.
+
+A snapshot is a read-only nested [[https://btrfs.readthedocs.io/en/latest/Subvolumes.html][subvolume]] created with a command such as =btrfs
+subvolume snapshot -r $SUBVOLUME $DEST=. *SNAPSHOTS ARE NOT RELIABLE BACKUPS!*
+If a subvolume is corrupted then all snapshots of that subvolume will also be
+corrupted.
+
+A backup is an [[https://btrfs.wiki.kernel.org/index.php/Incremental_Backup][incremental backup]] sent to some location via btrfs's
+[[https://btrfs.readthedocs.io/en/latest/Send-receive.html][send/receive]]. These backups will not be corrupted if the subvolume being backed
+up is corrupted.
+
+* My Btrfs Filesystem
+
+I like to have just one top-level btrfs subvolume mounted at =/=. This allows me
+to snapshot my entire system (excluding nested subvolumes) by running =btrfs
+subvolume snapshot -r / $DEST=.
+
+* My Yabsm Config
+
+My configuration is based on the philosophy that because snapshots are both
+valuable and cheap, it makes sense to take a lot of snapshots.
+
+Here is my =/etc/yabsm.conf=:
+
+#+BEGIN_SRC
+yabsm_dir=/.snapshots/yabsm
+
+subvol root_subvol {
+    mountpoint=/
+}
+
+snap root {
+    subvol=root_subvol
+
+    timeframes=5minute,hourly,daily
+    5minute_keep=36
+    hourly_keep=72
+    daily_times=15:00,23:59
+    daily_keep=62
+}
+
+ssh_backup slackmac {
+    subvol=root_subvol
+    ssh_dest=slackmac
+    dir=/.snapshots/yabsm-slacktop
+
+    timeframes=daily
+    daily_times=23:59
+    daily_keep=365
+}
+
+local_backup easystore {
+    subvol=root_subvol
+    dir=/mnt/easystore/backups/yabsm-slacktop
+
+    timeframes=daily
+    daily_times=23:59
+    daily_keep=365
+}
+#+END_SRC
+
+*** Yabsm Dir
+
+I use the traditional =/.snapshots/yabsm= directory as my /yabsm_dir/, which is
+the location that my snapshots will reside, and Yabsm will use for storing data
+neccesary for performing SSH and local backups.
+
+*** Subvol
+
+Like I mentioned earlier, I only have one top-level btrfs subvolume, so I only
+need to define one =subvol= in my Yabsm config, which I name =root_subvol=.
+
+*** Snap
+
+I define one [[https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#Snaps][snap]] named /root/ that tells Yabsm I want to take snapshots of
+=root_subvol= in the /5minute/, /hourly/, and /daily/ [[https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#Timeframes][timeframe categories]].
+
+In the /5minute/ timeframe category I keep 36 snapshots. This lets me go to any
+state of my machine in the last 3 hours in 5 minute increments. I use the
+/5minute/ category because it gives me a valuable safety net. How many times
+have you broke your code that was working 20 minutes ago? If you take /5minute/
+snapshots then you can easily go back to the state of that code 20 minutes ago.
+
+In the /hourly/ timeframe I keep 72 snapshots which allows me to go back 3 days
+in hourly increments. How many times have you broke code that was working 2 days
+ago? If you take /hourly/ snapshots (and keep enough of them) you can go back
+through the state of your machine per hour 2 days ago.
+
+In the /daily/ timeframe category I keep 62 snapshots taken at midnight (23:59)
+and midafternoon (15:00). This gives me two snapshots per day in the last month.
+
+Please note that there is also a =weekly= and =monthly= timeframe category
+category.
+
+*** SSH Backup
+
+I define one [[https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#SSH-Backups][ssh_backup]] named /slackmac/ that backs up my system to my old
+MacBook running Slackware.
+
+The /ssh_dest/ value is set to /slackmac/, which is host defined in the /yabsm/
+users =$HOME/.ssh/config= (Yabsm runs as a daemon, that runs as a locked-user
+named /yabsm/).
+
+The /dir/ value is set to the directory on /slackmac/ where the backups will be
+located.
+
+I perform this /ssh_backup/ only in the /daily/ timeframe category, where I
+perform a backup every night at midnight. I keep 365 of these backups so I can
+go back an entire year.
+
+*** Local Backup
+
+I define one [[https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#Local-Backups][local_backup]] named =easystore= that backup up my system to my
+EasyStore external hard drive.
+
+The hard drive is mounted at =/mnt/easystore=, and I keep my backups in the
+=/backups/yabsm-slacktop= directory in the hard drive.
+
+Just like my =slackmac= /ssh_backup/, I perform my /local_backup/ only in the
+=daily= timeframe category, every night at midnight.
+
+* Finding Snapshots
+
+Yabsm provides the [[https://metacpan.org/dist/App-Yabsm/view/bin/yabsm#Finding-Snapshots][find]] command that I use to jump around to different snapshots
+and backups. The /find/ command takes two arguments, the first is the name of
+any your /snaps/, /ssh_backups/, or /local_backups/. The second argument is a
+query. The different kinds of queries are all documented in the link above.
+
+Instead of repeating the documentation, let's break down a practical example of
+/finds/ usage.
+
+How many times have you broken code that worked 30 minutes ago? Because I take
+/5minute/ snapshots I can easily get back the state of the code 30 minutes ago.
+
+An example:
+
+=$ diff $HOME/projects/foo/foo.sh "$(yabsm find root back-30-mins)/$HOME/projects/foo/script.sh"=
+
+This command will show the =diff= output of the =$HOME/projects/foo/foo.sh=
+file with this same file that was snapshotted 30 minutes ago. We can use this
+output to help figure what we messed up.
+
+The command =yabsm find root back-30-mins= will output the path to a snapshot
+for the /snap/ named /root/ that was taken 30 minutes ago. In the example we use
+our shells [[https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html][parameter expansion]] feature to create a string that appends the path
+to =foo.sh= to the output of the =yabsm find= command. This is a powerful
+pattern!
+
+The find command can do more than find a snapshot taken N units ago:
+  + Find the newest or oldest snapshot/backup.
+  + Find a snapshot/backup taken on a specific day and time.
+  + Find all the snapshots/backups taken before or after a certain time.
+  + Find all the snapshots/backups taken between two times.
+  + Find all snapshots/backups.
+
+The output of =yabsm find --help= shows some examples:
+
+#+BEGIN_SRC
+usage: yabsm <find|f> [--help] [<SNAP|SSH_BACKUP|LOCAL_BACKUP> <QUERY>]
+
+see the section "Finding Snapshots" in 'man yabsm' for a detailed explanation on
+how to find snapshots and backups.
+
+examples:
+    yabsm find home_snap back-10-hours
+    yabsm f root_ssh_backup newest
+    yabsm f home_local_backup oldest
+    yabsm f home_snap 'between b-10-mins 15:45'
+    yabsm f root_snap 'after back-2-days'
+    yabsm f root_local_backup 'before b-14-d'
+#+END_SRC
+
+* Synopsis
+
+Yabsm is a powerful tool for managing your btrfs snapshots. If you are
+interested in using Yabsm, then I recommend you consult the official
+documentation.
