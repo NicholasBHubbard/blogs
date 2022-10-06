@@ -167,4 +167,3 @@ The output of `yabsm find --help` shows some examples:
 # Synopsis
 
 Yabsm is a powerful tool for managing your Btrfs snapshots. If you are interested in using Yabsm, then I recommend you consult the [official documentation](https://metacpan.org/release/NHUBBARD/App-Yabsm-3.12/view/bin/yabsm).
-
