@@ -132,7 +132,7 @@ How many times have you broken code that worked 30 minutes ago? Because I take *
 
 An example:
 
-    $ diff $HOME/projects/foo/foo.sh "$(yabsm find root back-30-mins)/$HOME/projects/foo/script.sh"
+    $ diff "$(yabsm find root back-30-mins)/$HOME/projects/foo/script.sh" $HOME/projects/foo/foo.sh
 
 This command will show the `diff` output of the `$HOME/projects/foo/foo.sh` file with this same file that was snapshotted 30 minutes ago. We can use this output to help figure out what we messed up.
 
