@@ -6,16 +6,17 @@
 the documentation for dzil is complete, it is not geared towards a
 beginner that has never created a Perl distribution before. This
 article provides a brief introduction to Dist::Zilla geared towards
-users that know little about Perl distributions.
+users that know little about Perl distributions in general.
 
 * What is a Perl distribution?
 
 A Perl distribution is an archive of files that includes a Perl
 module. There are no official rules on what non-module files must be
-included in a distribution, but they often include among other things,
-test scripts, a Makefile.pl, documentation, and the license. These
-distributions are commonly uploaded to CPAN so the author of the
-module can share it with others.
+included in a distribution, but they often include (among other
+things) test scripts, a Makefile.PL, documentation, and the
+license. These distributions are commonly uploaded to [[https://metacpan.org/][CPAN]], which is a
+place for Perl programmers to upload their Perl distributions for the
+purpose of sharing their code.
 
 * Why Dist::Zilla?
 
@@ -23,14 +24,14 @@ You may think that bundling together a Perl module with some other
 files is simple, but there are many things that need to be accounted
 for, and are prone to human error. There are also many possibilities
 for what somebody may want to include in a distribution, and how they
-want to include it. Dist::Zilla exists to be a one stop solution to
+want to include it. Dist::Zilla exists to be a one-stop solution to
 every possible problem involved in creating a Perl distribution.
 
 * Using Dist::Zilla
 
-When you install Dist::Zilla you will be provided with an
+When you install Dist::Zilla, you will be provided with an
 executable named =dzil=. The most important command that =dzil=
-provides is =build=, which when run in the projects root directory
+provides is =build=, which - when run in the projects root directory -
 outputs a distribution tarball. Other commands such as =test= and
 =release= are also provided, but when getting started with Dist::Zilla
 you will only need the =build= command.
@@ -38,13 +39,14 @@ you will only need the =build= command.
 * The "dist.ini" File
 
 Dist::Zilla is configured on a per-project basis through a file named
-=dist.ini=, which should be located at the root of the projects
+=dist.ini=, which should be located at the root of the project's
 directory tree.
 
 The beginning of a =dist.ini= file specifies required settings that
 every distribution should have. These settings include =name=,
-=version=, =abstract=, and =license= (there is also =author=, which
-isn't required but you probably want to add it as well).
+=version=, =abstract=, =copyright_holder=, and =license=. (There is
+also =author=, which isn't required but you probably want to add it as
+well.)
 
 Here is an example:
 
@@ -57,7 +59,7 @@ license = Perl_5
 abstract = the best software ever
 #+END_SRC
 
-After you specify these required settings you can then configure your
+After you specify these required settings, you can then configure your
 distribution by specifying what plugins you wish to use. Plugins are
 the mechanism that Dist::Zilla uses for providing features to your
 Perl distribution. If you have =dist.ini= that doesn't specify any
@@ -84,34 +86,34 @@ repository.url = https://github.com/JaneDoe/App-Foo.git
 [TestRelease]
 #+END_SRC
 
-
-The [[https://metacpan.org/pod/Dist::Zilla::Plugin::MetaResources][MetaResources]] plugin adds resource entries to the distributions
+The [[https://metacpan.org/pod/Dist::Zilla::Plugin::MetaResources][MetaResources]] plugin adds resource entries to the distribution's
 metadata. [[https://metacpan.org/][MetaCPAN]] can use this information to provide useful links
-to the distributions page.
+to the distribution's page.
 
 The [[https://metacpan.org/pod/Dist::Zilla::Plugin::GatherDir][GatherDir]] and [[https://metacpan.org/pod/Dist::Zilla::Plugin::PruneCruft][PruneCruft]] plugins tell Dist::Zilla that you want to
-include all the files in your projects directory into the
+include all the files in your project's directory into the
 distribution, excluding the ones you certainly don't want. The files
 you certainly don't want include build artifacts introduced by recent
 invocations of Dist::Zilla. The combination of these two plugins is
 used in almost every Dist::Zilla project.
 
 The [[MakeMaker][MakeMaker]] plugin will tell Dist::Zilla to produce an
-[[https://metacpan.org/pod/ExtUtils::MakeMaker][ExtUtils::MakeMaker]]-powered Makefile.pl. Dist::Zilla will deal with
-everything required to create a proper Makefile.pl, so you do not need
+[[https://metacpan.org/pod/ExtUtils::MakeMaker][ExtUtils::MakeMaker]]-powered Makefile.PL. Dist::Zilla will deal with
+everything required to create a proper Makefile.PL, so you do not need
 to know anything about ExtUtils::MakeMaker. Unless you are doing
-something special , you almost certainly want to use this plugin.
+something special, you almost certainly want to use this plugin.
 
 The [[https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN][UploadToCPAN]] plugin will allow you to use the =dzil release=
 command to upload your distribution to CPAN.
 
-It is important to note that the functions each plugin provides take
-place in the order that the plugins are specified in your =dist.ini=.
+It is important to note that each plugin takes effect in the order the
+plugins are specified in your dist.ini.
 
-There are *many* plugins available for Dist::Zilla that can do just
-about anything you could possibly need for creating a distribution.
-[[https://metacpan.org/search?size=20&q=Dist%3A%3AZilla%3A%3APlugin][Here]] is a link for a metacpan query for "Dist::Zilla::Plugin", that
-can be used to explore the Dist::Zilla plugin ecosystem.
+There are *many* plugins available for Dist::Zilla - over 1,200 thus
+far - so you will probably find one that can do just about anything
+you could possibly need for creating a distribution. [[https://metacpan.org/search?size=20&q=Dist%3A%3AZilla%3A%3APlugin][Here]] is a link
+for a metacpan query for "Dist::Zilla::Plugin", that can be used to
+explore the Dist::Zilla plugin ecosystem.
 
 Here are links to the documentation for the plugins in the example
 =dist.ini= that I did not explain:
