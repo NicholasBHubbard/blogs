@@ -97,7 +97,7 @@ you certainly don't want include build artifacts introduced by recent
 invocations of Dist::Zilla. The combination of these two plugins is
 used in almost every Dist::Zilla project.
 
-The [[MakeMaker][MakeMaker]] plugin will tell Dist::Zilla to produce an
+The [[https://metacpan.org/pod/Dist::Zilla::Plugin::MakeMaker][MakeMaker]] plugin will tell Dist::Zilla to produce an
 [[https://metacpan.org/pod/ExtUtils::MakeMaker][ExtUtils::MakeMaker]]-powered Makefile.PL. Dist::Zilla will deal with
 everything required to create a proper Makefile.PL, so you do not need
 to know anything about ExtUtils::MakeMaker. Unless you are doing
