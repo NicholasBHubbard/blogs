@@ -16,12 +16,12 @@ read-only configuration without the need for a global variable or any CPAN modul
 
 Here is the pattern:
 
-```perl
+#+BEGIN_SRC
 {
     my %config = parse_user_config();
     sub config { %config }
 }
-```
+#+END_SRC
 
 This pattern allows us to use the `&config` subroutine as somewhat of a constant.
 
@@ -32,7 +32,7 @@ Though seemingly simple, there is a lot to unpack in this piece of code.
 Let us start with a brief explanation on Perl's [[https://perldoc.perl.org/perlsyn#Basic-BLOCKs][blocks]]. A block, denoted by a set of curly braces, introduces a new
 [[https://en.wikipedia.org/wiki/Scope_(computer_science)#Lexical_scope][lexical scope]]. Here is an example:
 
-```perl
+#+BEGIN_SRC
 {
     my $v1 = 'camel';
 
@@ -44,16 +44,16 @@ Let us start with a brief explanation on Perl's [[https://perldoc.perl.org/perls
 
     print "From outer block:\n  \$v2 = $v2\n";
 }
-```
+#+END_SRC
 
 If we run this code with get the following output (we would get an error under [[https://perldoc.perl.org/strict][strict]]):
 
-```
+#+BEGIN_SRC
 From inner block:
   $v2 = camel onion
 From outer block:
   $v2 =
-```
+#+END_SRC
 
 You can think of a lexical scope as a container for lexical variables (declared with [[https://perldoc.perl.org/functions/my][my]]). When you create a new lexical
 scope, all the lexical variables defined in outer scopes are available in the new scope. However at the end of the
@@ -66,7 +66,7 @@ inner block, we can see that the `$v2` variable is no longer available.
 The next concept we need to explain is a [[https://en.wikipedia.org/wiki/Closure_(computer_programming)][closure]]. A closure is a function that encapsulates its lexical state. Let us
 look at a simple (and the classic) example.
 
-```perl
+#+BEGIN_SRC
 {
     my $counter = 0;
 
@@ -79,15 +79,15 @@ look at a simple (and the classic) example.
 increment();
 increment();
 increment();
-```
+#+END_SRC
 
 Here is the output we get from running this program:
 
-```
+#+BEGIN_SRC
 $counter = 1
 $counter = 2
 $counter = 3
-```
+#+END_SRC
 
 We can see that our `&increment` subroutine saves the value of `$counter` across invocations.
 
@@ -97,12 +97,12 @@ We now have all the knowledge we need to understand our pattern for read-only co
 
 Just to refresh, here is the pattern again:
 
-```perl
+#+BEGIN_SRC
 {
     my %config = parse_config_file();
     sub config { %config }
 }
-```
+#+END_SRC
 
 The `&config` subroutine is a closure that simply returns the `%config` variable that it closes over. The `%config`
 variable is completely private to the `&config` method however, because it is a lexical variable, and this pattern takes
@@ -112,7 +112,7 @@ place in it's own block.  This means we can be completely sure that no other cod
 Another interesting aspect of this pattern is that you can structure your program such that the value of the `%config`
 is calculated before the main runtime of the program. Here is an example:
 
-```perl
+#+BEGIN_SRC
 sub main {
     print "Hello from &main\n";
     parse_config_file();
@@ -129,15 +129,15 @@ sub parse_config_file {
 }
 
 main();
-```
+#+END_SRC
 
 This program outputs the following:
 
-```
+#+BEGIN_SRC
 Hello from &parse_config_file
 Hello from &main
 Hello from &parse_config_file
-```
+#+END_SRC
 
 As you can see the configuration was parsed before &main.
 
