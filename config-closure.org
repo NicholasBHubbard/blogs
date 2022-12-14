@@ -1,0 +1,148 @@
+# -*- mode:org;mode:auto-fill;fill-column:120 -*-
+#+title: A Perl Pattern for Read-Only Configuration Access
+#+author: Nicholas Hubbard
+
+Some programs have many subroutines that need access to some read-only configuration. Deciding how to provide access to
+this configuration in a safe way, that ensures no mutation will take place, is important to the reliability of the
+program.
+
+The simplest thing to do is to use a global variable. The problem with using a global variable is that you have to be
+careful to not mutate it or else your program may behave mysteriously. If you trust yourself not to mess up, then using
+a global variable is fine. An improved way to implement global variables it to use [[https://metacpan.org/pod/Const::Fast][Const::Fast]] from CPAN to make the
+variable truly read-only.
+
+In this article however we will explore an interesting pattern that I came up with that provides convenient access to a
+read-only configuration without the need for a global variable or any CPAN module.
+
+Here is the pattern:
+
+```perl
+{
+    my %config = parse_user_config();
+    sub config { %config }
+}
+```
+
+This pattern allows us to use the `&config` subroutine as somewhat of a constant.
+
+Though seemingly simple, there is a lot to unpack in this piece of code.
+
+* Blocks
+
+Let us start with a brief explanation on Perl's [[https://perldoc.perl.org/perlsyn#Basic-BLOCKs][blocks]]. A block, denoted by a set of curly braces, introduces a new
+[[https://en.wikipedia.org/wiki/Scope_(computer_science)#Lexical_scope][lexical scope]]. Here is an example:
+
+```perl
+{
+    my $v1 = 'camel';
+
+    {
+        my $v2 = "$v1 onion";
+
+        print "From inner block:\n  \$v2 = $v2\n";
+    }
+
+    print "From outer block:\n  \$v2 = $v2\n";
+}
+```
+
+If we run this code with get the following output (we would get an error under [[https://perldoc.perl.org/strict][strict]]):
+
+```
+From inner block:
+  $v2 = camel onion
+From outer block:
+  $v2 =
+```
+
+You can think of a lexical scope as a container for lexical variables (declared with [[https://perldoc.perl.org/functions/my][my]]). When you create a new lexical
+scope, all the lexical variables defined in outer scopes are available in the new scope. However at the end of the
+scope, the variables are no longer available. In the example above we can see that the `$v1` variable is available in
+the inner block. We use this `$v1` variable to create a new lexical variable named `$v2`. However, after the end of the
+inner block, we can see that the `$v2` variable is no longer available.
+
+* Closures
+
+The next concept we need to explain is a [[https://en.wikipedia.org/wiki/Closure_(computer_programming)][closure]]. A closure is a function that encapsulates its lexical state. Let us
+look at a simple (and the classic) example.
+
+```perl
+{
+    my $counter = 0;
+
+    sub increment {
+        $counter++;
+        print "\$counter = $counter\n";
+    }
+}
+
+increment();
+increment();
+increment();
+```
+
+Here is the output we get from running this program:
+
+```
+$counter = 1
+$counter = 2
+$counter = 3
+```
+
+We can see that our `&increment` subroutine saves the value of `$counter` across invocations.
+
+* Putting It All Together
+
+We now have all the knowledge we need to understand our pattern for read-only configuration access.
+
+Just to refresh, here is the pattern again:
+
+```perl
+{
+    my %config = parse_config_file();
+    sub config { %config }
+}
+```
+
+The `&config` subroutine is a closure that simply returns the `%config` variable that it closes over. The `%config`
+variable is completely private to the `&config` method however, because it is a lexical variable, and this pattern takes
+place in it's own block.  This means we can be completely sure that no other code in our program can ever modify
+`%config`. We can be completely sure the `&config` subroutine always returns the same configuration.
+
+Another interesting aspect of this pattern is that you can structure your program such that the value of the `%config`
+is calculated before the main runtime of the program. Here is an example:
+
+```perl
+sub main {
+    print "Hello from &main\n";
+    parse_config_file();
+}
+
+{
+    my %config = parse_config_file();
+    sub config { %config }
+}
+
+sub parse_config_file {
+    print "Hello from &parse_config_file\n";
+    return (foo => 12, bar => 42);
+}
+
+main();
+```
+
+This program outputs the following:
+
+```
+Hello from &parse_config_file
+Hello from &main
+Hello from &parse_config_file
+```
+
+As you can see the configuration was parsed before &main.
+
+* Synopsis
+
+There are many ways to deal with providing your program with access to a read-only configuration. In this article we
+presented an interesting way to do it using blocks and closures. This strategy may not be suitable for all programs, but
+it is at least interesting.
