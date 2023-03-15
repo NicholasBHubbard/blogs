@@ -44,7 +44,7 @@ from the most inner block $var = foo
 from outside the block $var = 
 ```
 
-This code example shows that a block introduces a lexical scope. Variables defined in a lexical scope are only available in its defining scope, and lexical scopes nested inside their defining scope. We can see that the `$var` variable is available in the scope it is defined in, and from the scope nested in its defining scope. However, outside of its defining scope, `$var` is not defined.
+This code shows that a block introduces a lexical scope. Variables defined in a lexical scope are only available in its defining scope, and scopes nested inside their defining scope. The program output shows that the `$var` variable is available in the scope it is defined in, and from the scope nested in its defining scope. However, outside of its defining scope, `$var` is not defined.
 
 If we turn on `strict` we get a fatal compilation error for trying to use `$var` from outside its defining scope:
 
