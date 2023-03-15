@@ -232,4 +232,4 @@ There are many ways we can solve this problem. First, we could use [lock_hash_re
 
 We could also use [Const::Fast](https://metacpan.org/pod/Const::Fast) from CPAN to make `%config` an actual read-only hash. Similarly to locking the hash, we would get an error if we tried to mutate `%config`.
 
-Finally, we could use [Clone](https://metacpan.org/pod/Clone) from CPAN to return a deep-copy of `%config` from the `config()` subroutine. Unlike the other solutions, our code could freely modify copies of `%config` without getting any errors, but these modifications would not effect the actual `%config`.
+Finally, we could use [Clone](https://metacpan.org/pod/Clone) from CPAN to return a deep-copy of `%config` from the `config()` subroutine. Unlike the other solutions, our code could freely modify copies of `%config` without getting any errors, but these modifications would not affect the actual `%config`.
