@@ -193,7 +193,7 @@ Uh oh! We were able to mutate the `%config` variable that `config()` closes over
 
 Here is a code example that shows that Perl does not perform deep-copying:
 
-```
+```perl
 use strict;
 
 my @array1 = ([1, 2, 3], [4, 5, 6], [7, 8, 9]);
