@@ -1,6 +1,6 @@
 # An Interesting Perl Pattern That Doesn't Work
 
-I recently came up with an interesting pattern that uses a closure to return a read-only configuration. Unfortunately, this pattern has a terrible flaw.
+I recently came up with an interesting pattern that is supposed to use a closure to return a read-only configuration. Unfortunately, this pattern has a terrible flaw.
 
 ```perl
 {
