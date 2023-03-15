@@ -18,7 +18,7 @@ The `config()` subroutine is a lexical closure over the `%config` hash. No other
 
 As an aside, this pattern could just as easily be written with a [state variable](https://perldoc.perl.org/functions/state), but I find it harder to explain the pattern when done this way.
 
-If you already understands blocks and closures, then you may want to skip their explanations and go straight to an explanation of the actual problem [here](# The Problem).
+If you already understands blocks and closures, then you may want to skip their explanations and go straight to an explanation of the actual problem [here](#-The-Problem).
 
 # Blocks
 
