@@ -230,6 +230,6 @@ In this programs output we can see that `@array1` and `@array2` contain the exac
 
 There are many ways we can solve this problem. First, we could use [lock_hash_recurse](https://perldoc.perl.org/Hash::Util#lock_hash_recurse) from the core [Hash::Util](https://perldoc.perl.org/Hash::Util) module to lock `%config`. After locking `%config`, we would get an error if we tried to mutate any of its values.
 
-We could also use [Const::Fast](https://metacpan.org/pod/Const::Fast) from CPAN to make `%config` a true read-only hash. Similarly to locking the hash, we would get an error if we tried to mutate `%config`.
+We could also use [Const::Fast](https://metacpan.org/pod/Const::Fast) from CPAN to make `%config` an actual read-only hash. Similarly to locking the hash, we would get an error if we tried to mutate `%config`.
 
 Finally, we could use [Clone](https://metacpan.org/pod/Clone) from CPAN to return a deep-copy of `%config` from the `config()` subroutine. Unlike the other solutions, our code could freely modify copies of `%config` without getting any errors, but these modifications would not effect the actual `%config`.
