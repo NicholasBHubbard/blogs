@@ -23,6 +23,22 @@ printing is banned
 
 If anybody has seen a legitimate use of this feature then please comment below.
 
+### Recursive Anonymous Subroutines With __SUB__
+
+Perl version 5.16 introduced the [__SUB__](https://perldoc.perl.org/functions/__SUB__) special token that holds a reference to the current subroutine. You can use `__SUB__` to make a recursive call in an anonymous subroutine.
+
+```perl
+use v5.16;
+
+higher_order_function(
+    sub {
+        my $n = shift;
+        if ($n <= 1) { return 1 }
+        else         { return $n * __SUB__->($n-1) }
+    }
+)
+```
+
 ### Goto Searches For Labels In The Dynamic Scope
 
 The following example shows that [goto](https://perldoc.perl.org/functions/goto) searches for its label argument from within the current [dynamic scope](https://en.wikipedia.org/wiki/Scope_(computer_science)#Dynamic_scope).
@@ -55,21 +71,7 @@ hello from after LABEL
 
 This program just goes on forever printing `hello from after LABEL`.
 
-### Recursive Anonymous Subroutines With __SUB__
-
-Perl version 5.16 introduced the [__SUB__](https://perldoc.perl.org/functions/__SUB__) special token that holds a reference to the current subroutine. You can use `__SUB__` to make a recursive call in an anonymous subroutine.
-
-```perl
-use v5.16;
-
-higher_order_function(
-    sub {
-        my $n = shift;
-        if ($n <= 1) { return 1 }
-        else         { return $n * __SUB__->($n-1) }
-    }
-)
-```
+This is another feature that you should leave a comment about if you have seen a legitimate usage of it.
 
 ### Regex Modifier For Only Portions Of The Regex
 
