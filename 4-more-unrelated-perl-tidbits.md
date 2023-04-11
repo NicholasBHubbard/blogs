@@ -97,7 +97,7 @@ does not match
 
 This feature is useful if you want to turn a modifier on/off for only a portion of the regex:
 
-```
+```perl
 if ('fooBAR' =~ /(?-i:foo)bar/i) {
     print "matches\n"
 } else {
