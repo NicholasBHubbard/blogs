@@ -4,7 +4,7 @@ Last year I wrote an article titled [4 Unrelated Perl Tidbits](https://dev.to/ni
 
 ### Built-Ins Can Be Overridden with Lexical Subroutines
 
-Perl version 5.18 introduced [lexical subroutines](https://perldoc.perl.org/perlsub#Lexical-Subroutines), which are often referred to as "my subs". An interesting characteristic of lexical subs is that unlike regular subroutines, they can override built-ins.
+Perl version 5.18 introduced [lexical subroutines](https://perldoc.perl.org/perlsub#Lexical-Subroutines), which are often sometimes to as "my subs". An interesting characteristic of lexical subs is that unlike regular subroutines, they can override built-ins.
 
 ```perl
 use v5.18;
