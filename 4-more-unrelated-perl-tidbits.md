@@ -25,7 +25,7 @@ If anybody has seen a legitimate use of this feature then please comment below.
 
 ### Recursive Anonymous Subroutines With __SUB__
 
-Perl version 5.16 introduced the [__SUB__](https://perldoc.perl.org/functions/__SUB__) special token that holds a reference to the current subroutine. You can use `__SUB__` to make a recursive call in an anonymous subroutine.
+Perl version 5.16 introduced the [\_\_SUB\_\_](https://perldoc.perl.org/functions/__SUB__) special token that holds a reference to the current subroutine. You can use `__SUB__` to make a recursive call in an anonymous subroutine.
 
 ```perl
 use v5.16;
