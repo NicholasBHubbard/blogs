@@ -25,7 +25,7 @@ If anybody has seen a legitimate use of this feature then please comment below.
 
 ### Goto Searches For Labels In The Dynamic Scope
 
-[Goto](https://perldoc.perl.org/functions/goto) searches for labels from within its [dynamic scope](https://en.wikipedia.org/wiki/Scope_(computer_science)#Dynamic_scope).
+The following example shows that [goto](https://perldoc.perl.org/functions/goto) searches for its label argument from within the current [dynamic scope](https://en.wikipedia.org/wiki/Scope_(computer_science)#Dynamic_scope).
 
 ```perl
 sub foo {
