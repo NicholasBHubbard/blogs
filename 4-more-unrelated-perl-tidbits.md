@@ -30,7 +30,7 @@ Perl version 5.16 introduced the [__SUB__](https://perldoc.perl.org/functions/__
 ```perl
 use v5.16;
 
-higher_order_function(
+higher_order_subroutine(
     sub {
         my $n = shift;
         if ($n <= 1) { return 1 }
