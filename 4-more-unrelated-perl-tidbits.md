@@ -41,7 +41,7 @@ higher_order_function(
 
 ### Goto Searches For Labels In The Dynamic Scope
 
-The following example shows that [goto](https://perldoc.perl.org/functions/goto) searches for its label argument from within the current [dynamic scope](https://en.wikipedia.org/wiki/Scope_(computer_science)#Dynamic_scope).
+The following example shows that [goto](https://perldoc.perl.org/functions/goto) searches for its label argument from within the current [dynamic scope](https://en.wikipedia.org/wiki/Scope_(computer_science)#Dynamic_scope). Note that this program just goes on forever printing `hello from after LABEL`:
 
 ```perl
 sub foo {
@@ -68,8 +68,6 @@ hello from after LABEL
 hello from after LABEL
 ...
 ```
-
-This program just goes on forever printing `hello from after LABEL`.
 
 This is another feature that you should leave a comment about if you have seen a legitimate usage of it.
 
