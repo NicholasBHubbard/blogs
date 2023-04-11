@@ -2,7 +2,7 @@
 
 Last year I wrote an article titled [4 Unrelated Perl Tidbits](https://dev.to/nicholasbhubbard/4-unrelated-perl-tidbits-2766), where I talked about some random Perl facts I learned about from reading [Programming Perl](https://www.oreilly.com/library/view/programming-perl-4th/9781449321451/). In this article I will talk about 4 more random and interesting Perl features I have learned about since.
 
-# Built-Ins Can Be Overridden with Lexical Subroutines
+### Built-Ins Can Be Overridden with Lexical Subroutines
 
 Perl version 5.18 introduced [lexical subroutines](https://perldoc.perl.org/perlsub#Lexical-Subroutines), which are often referred to as "my subs". An interesting characteristic of lexical subs is that unlike regular subroutines, they can override built-ins.
 
@@ -23,7 +23,7 @@ printing is banned
 
 If anybody has seen a legitimate use of this feature then please comment below.
 
-# Goto Searches For Labels In The Dynamic Scope
+### Goto Searches For Labels In The Dynamic Scope
 
 [Goto](https://perldoc.perl.org/functions/goto) searches for labels from within its [dynamic scope](https://en.wikipedia.org/wiki/Scope_(computer_science)#Dynamic_scope).
 
@@ -55,7 +55,7 @@ hello from after LABEL
 
 This program just goes on forever printing `hello from after LABEL`.
 
-# Recursive Anonymous Subroutines With __SUB__
+### Recursive Anonymous Subroutines With __SUB__
 
 Perl version 5.16 introduced the [__SUB__](https://perldoc.perl.org/functions/__SUB__) special token that holds a reference to the current subroutine. You can use `__SUB__` to make a recursive call in an anonymous subroutine.
 
@@ -71,7 +71,7 @@ higher_order_function(
 )
 ```
 
-# Regex Modifier For Only Portions Of The Regex
+### Regex Modifier For Only Portions Of The Regex
 
 You can use the `(?M:)` pattern in a regex to turn on the modifier specified by `M`, only inside the parentheses. For example, the following two regexs are the same:
 
