@@ -58,3 +58,22 @@ This implementation saves disk space as the data is being teed to a named pipe i
 Problem solved :)
 
 (Thanks to thrig on the #perl Libera IRC channel for helping lead me to this solution)
+
+# EDIT
+
+I got some great feedback from u/gorkish on reddit with a much simpler way to solve the problem by running the SlackBuild script with [open](https://perldoc.perl.org/functions/open#Opening-a-filehandle-into-a-command) instead of system. Here is the code:
+
+```perl
+sub build_slackware_pkg {
+    my ($pkg_name) = @_;
+    my $slackbuild_script = find_slackbuild_script($pkg_name);
+    open(my $cmd, '-|', $slackbuild_script);
+    my $slackware_pkg;
+    while (my $line = <$cmd>) {
+        $slackware_pkg = $1 if $line =~ /^Slackware package (.+) created$/;
+        print $line;
+    }
+    close $fh;
+    return $slackware_pkg;
+}
+```
