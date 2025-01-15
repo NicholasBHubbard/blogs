@@ -1,4 +1,3 @@
-
 How I used a named pipe to save memory (in Perl)
 
 I recently ran into an interesting bug in my Slackware package manager [sbozyp](https://github.com/NicholasBHubbard/sbozyp). In this post I will detail the bug and my solution.
@@ -55,3 +54,5 @@ sub build_slackware_pkg {
 ```
 
 This implementation saves disk space as the data is being teed to a named pipe instead of a regular file in /tmp. As data is written to the pipe it is immediately being read, throwing away all the data that sbozyp doesn't need.
+
+Problem solved :)
