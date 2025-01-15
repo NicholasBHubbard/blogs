@@ -56,3 +56,5 @@ sub build_slackware_pkg {
 This implementation saves disk space as the data is being teed to a named pipe instead of a regular file in /tmp. As data is written to the pipe it is immediately being read, throwing away all the data that sbozyp doesn't need.
 
 Problem solved :)
+
+(Thanks to thrig on the #perl Libera IRC channel for helping lead me to this solution)
