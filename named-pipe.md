@@ -4,11 +4,11 @@ I recently ran into an interesting bug in my Slackware package manager [sbozyp](
 
 Disclaimer: the code snippets in this post do not deal with every edge case and are only meant to convey the ideas relevant to this blog post.
 
-Sbozyp is a package manager for [SlackBuilds.org](https://www.slackbuilds.org/), a repository of build scripts for Slackware packages. There is a very important subroutine in sbozyp named `build_slackware_pkg()` that (basically) takes the name of a package, builds it into a Slackware package, and returns the path to the built package. To build the package we must execute the packages SlackBuild script. A SlackBuild script always has the general form: { basic setup -> perform build procedure -> conglomerate built parts into a Slackware package }. The last step is always performed by a Slackware-specific tool called [makepkg](http://www.slackware.com/config/packages.php). Unfortunately there is no way (that I know of) to be able to determine the name of the Slackware package before executing the SlackBuild script. For this reason sbozyp must inspect the [stdout](https://en.wikipedia.org/wiki/Standard_streams) of the SlackBuild script to look for a line that makepkg always outputs that looks like `Slackware package $PATH created.`. It is also important of course that the user can see the output of the SlackBuild script as it may contain vital information. This means that both my program and the user needs to examine the output of the SlackBuild script. (See [here](https://www.slackwiki.com/SlackBuild_Scripts) for more information on SlackBuild scripts)
+Sbozyp is a package manager for [SlackBuilds.org](https://www.slackbuilds.org/), a repository of build scripts for Slackware packages. There is a very important subroutine in sbozyp named `build_slackware_pkg()` that (basically) takes the name of a package, builds it into a Slackware package, and returns the path to the built package. To build the package we must execute the packages SlackBuild script. A SlackBuild script always has the general form: { basic setup -> perform build procedure -> conglomerate built parts into a Slackware package }. The last step is always performed by a Slackware-specific tool called [makepkg](http://www.slackware.com/config/packages.php). Unfortunately there is no way (that I know of) to be able to determine the name of the Slackware package before executing the SlackBuild script. For this reason sbozyp must inspect the [stdout](https://en.wikipedia.org/wiki/Standard_streams) of the SlackBuild script to look for a line that makepkg always outputs that looks like `Slackware package $PATH created`. It is also important of course that the user can see the output of the SlackBuild script as it may contain vital information. This means that both my program and the user needs to examine the output of the SlackBuild script. (See [here](https://www.slackwiki.com/SlackBuild_Scripts) for more information on SlackBuild scripts)
 
 With the problem description out of the way we can now focus on the solution.
 
-My original solution was an obvious one but had an interesting bug. I simply would use Perl's [system](https://perldoc.perl.org/functions/system) command to execute the SlackBuild script with a shell, where I would pipe stdout to [tee](https://en.wikipedia.org/wiki/Tee_(command)), writing the stdout to a temporary file. After the SlackBuild would execute I would read the temporary file looking for the `Slackware package $PATH created.` line. This solved the problem of allowing both the user and sbozyp to read the stdout of the SlackBuild script. For 99% of builds this worked fine ... but then there was [qemu](https://www.qemu.org/). Qemu is a massive project that requires a huge compilation. My system uses a 4GB tmpfs mounted at /tmp, and the temporary file that was being teed to ended up getting so large from all the qemu compilation output that tee (and thus sbozyp) crashed for "device out of space".
+My original solution was an obvious one but had an interesting bug. I simply would use Perl's [system](https://perldoc.perl.org/functions/system) command to execute the SlackBuild script with a shell, where I would pipe stdout to [tee](https://en.wikipedia.org/wiki/Tee_(command)), writing the stdout to a temporary file. After the SlackBuild would execute I would read the temporary file looking for the `Slackware package $PATH created` line. This solved the problem of allowing both the user and sbozyp to read the stdout of the SlackBuild script. For 99% of builds this worked fine ... but then there was [qemu](https://www.qemu.org/). Qemu is a massive project that requires a huge compilation. My system uses a 4GB tmpfs mounted at /tmp, and the temporary file that was being teed to ended up getting so large from all the qemu compilation output that tee (and thus sbozyp) crashed for "device out of space".
 
 Here is a basic (not actually realistic to sbozyp) outline of that code:
 
@@ -21,13 +21,13 @@ sub build_slackware_pkg {
     open my $fh, '<', $tmp_file or die;
     my $slackware_pkg;
     while (my $stdout_line = <$tmp_file>) {
-        $slackware_pkg = $1 if $stdout_line =~ /^Slackware package (.+) created\.$/;
+        $slackware_pkg = $1 if $stdout_line =~ /^Slackware package (.+) created$/;
     }
     return $slackware_pkg;
 }
 ```
 
-To solve the problem I create a [named pipe](https://en.wikipedia.org/wiki/Named_pipe), fork, and use the child process to execute the SlackBuild script, teeing stdout to the named pipe. From the parent I read the named pipe looking for the magic `Slackware package $PATH created.` line. Here is a (also not realistic to sbozyp) outline of this code:
+To solve the problem I create a [named pipe](https://en.wikipedia.org/wiki/Named_pipe), fork, and use the child process to execute the SlackBuild script, teeing stdout to the named pipe. From the parent I read the named pipe looking for the magic `Slackware package $PATH created` line. Here is a (also not realistic to sbozyp) outline of this code:
 
 ```perl
 use POSIX qw(mkfifo WNOHANG);
@@ -45,7 +45,7 @@ sub build_slackware_pkg {
         open my $fifo_r_fh, '<', $fifo or die;
         my $slackware_pkg;
         while (waitpid($pid, WNOHANG) == 0 or my $stdout_line = <$fifo_r_fh>) {
-            $slackware_pkg = $1 if $stdout_line and $stdout_line =~ /^Slackware package (.+) created\.$/;
+            $slackware_pkg = $1 if $stdout_line and $stdout_line =~ /^Slackware package (.+) created$/;
         }
         die if $? != 0; # $? has exit status of child
         return $slackware_pkg;
